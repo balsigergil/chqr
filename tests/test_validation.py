@@ -334,41 +334,35 @@ class TestAmountValidation:
 
     def test_currency_validation(self):
         """Test only CHF and EUR are allowed."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Valid currencies
-        # QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     amount=Decimal("100.00"),
-        #     currency="CHF"
-        # )
-        #
-        # QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     amount=Decimal("100.00"),
-        #     currency="EUR"
-        # )
-        #
-        # # Invalid currency
-        # with pytest.raises(ValidationError, match="CHF.*EUR"):
-        #     QRBill(
-        #         account="CH5800791123000889012",
-        #         creditor=creditor,
-        #         amount=Decimal("100.00"),
-        #         currency="USD"
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid currencies
+        QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("100.00"),
+            currency="CHF",
+        )
+
+        QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("100.00"),
+            currency="EUR",
+        )
+
+        # Invalid currency
+        with pytest.raises(ValidationError, match="CHF.*EUR"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                amount=Decimal("100.00"),
+                currency="USD",
+            )
 
 
 class TestAddressValidation:
@@ -422,64 +416,29 @@ class TestCharacterSetValidation:
 
     def test_valid_characters_accepted(self):
         """Test that allowed Unicode characters are accepted."""
-        pytest.skip("Not implemented yet")
+        from chqr import Creditor
 
-        # from chqr import Creditor
-        #
-        # # Basic Latin, Latin-1 Supplement, Latin Extended A
-        # Creditor(
-        #     name="Müller & Söhne",
-        #     postal_code="8000",
-        #     city="Zürich",
-        #     country="CH"
-        # )
-        #
-        # # Euro sign
-        # Creditor(
-        #     name="Test € Company",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Romanian characters (Ș, ș, Ț, ț)
-        # Creditor(
-        #     name="Ștefan Țepeș",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
+        # Basic Latin, Latin-1 Supplement, Latin Extended A
+        Creditor(name="Müller & Söhne", postal_code="8000", city="Zürich", country="CH")
+
+        # Euro sign
+        Creditor(name="Test € Company", postal_code="8000", city="Zurich", country="CH")
+
+        # Romanian characters (Ș, ș, Ț, ț)
+        Creditor(name="Ștefan Țepeș", postal_code="8000", city="Zurich", country="CH")
 
     def test_invalid_characters_rejected(self):
         """Test that non-Latin characters are rejected."""
-        pytest.skip("Not implemented yet")
+        from chqr import Creditor, ValidationError
 
-        # from chqr import Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # # Cyrillic
-        # with pytest.raises(ValidationError, match="character"):
-        #     Creditor(
-        #         name="Тест",
-        #         postal_code="8000",
-        #         city="Zurich",
-        #         country="CH"
-        #     )
-        #
-        # # Chinese
-        # with pytest.raises(ValidationError, match="character"):
-        #     Creditor(
-        #         name="测试",
-        #         postal_code="8000",
-        #         city="Zurich",
-        #         country="CH"
-        #     )
-        #
-        # # Arabic
-        # with pytest.raises(ValidationError, match="character"):
-        #     Creditor(
-        #         name="اختبار",
-        #         postal_code="8000",
-        #         city="Zurich",
-        #         country="CH"
-        #     )
+        # Cyrillic
+        with pytest.raises(ValidationError, match="character"):
+            Creditor(name="Тест", postal_code="8000", city="Zurich", country="CH")
+
+        # Chinese
+        with pytest.raises(ValidationError, match="character"):
+            Creditor(name="测试", postal_code="8000", city="Zurich", country="CH")
+
+        # Arabic
+        with pytest.raises(ValidationError, match="character"):
+            Creditor(name="اختبار", postal_code="8000", city="Zurich", country="CH")

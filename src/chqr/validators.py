@@ -277,10 +277,13 @@ def validate_address_field(
     if required and not value:
         raise ValidationError(f"{field_name} is required")
 
-    if value and len(value) > max_length:
-        raise ValidationError(
-            f"{field_name} cannot exceed {max_length} characters, got {len(value)}"
-        )
+    if value:
+        if len(value) > max_length:
+            raise ValidationError(
+                f"{field_name} cannot exceed {max_length} characters, got {len(value)}"
+            )
+        # Validate character set
+        validate_character_set(value, field_name)
 
 
 def validate_country_code(country: str) -> None:
@@ -307,3 +310,59 @@ def validate_country_code(country: str) -> None:
 
     if not country.isupper():
         raise ValidationError("Country code must be uppercase")
+
+
+def validate_character_set(value: str, field_name: str) -> None:
+    """Validate that string contains only allowed characters for QR-bill.
+
+    Allowed characters according to Swiss QR-bill spec (section 4.1.1):
+    - Basic Latin (U+0020–U+007E)
+    - Latin-1 Supplement (U+00A0–U+00FF)
+    - Latin Extended-A (U+0100–U+017F)
+    - Plus specific characters: Ș (U+0218), ș (U+0219), Ț (U+021A), ț (U+021B), € (U+20AC)
+
+    Args:
+        value: The string to validate
+        field_name: Name of the field (for error messages)
+
+    Raises:
+        ValidationError: If string contains invalid characters
+    """
+    if not value:
+        return
+
+    # Define allowed Unicode ranges
+    allowed_ranges = [
+        (0x0020, 0x007E),  # Basic Latin
+        (0x00A0, 0x00FF),  # Latin-1 Supplement
+        (0x0100, 0x017F),  # Latin Extended-A
+    ]
+
+    # Additional allowed characters
+    allowed_chars = {
+        0x0218,  # Ș
+        0x0219,  # ș
+        0x021A,  # Ț
+        0x021B,  # ț
+        0x20AC,  # €
+    }
+
+    for char in value:
+        code_point = ord(char)
+        is_valid = False
+
+        # Check if in allowed ranges
+        for start, end in allowed_ranges:
+            if start <= code_point <= end:
+                is_valid = True
+                break
+
+        # Check if in additional allowed characters
+        if code_point in allowed_chars:
+            is_valid = True
+
+        if not is_valid:
+            raise ValidationError(
+                f"{field_name} contains invalid character '{char}' (U+{code_point:04X}). "
+                f"Only Latin characters are allowed."
+            )
