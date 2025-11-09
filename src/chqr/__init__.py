@@ -1,2 +1,6 @@
-def hello() -> str:
-    return "Hello from chqr!"
+"""Swiss QR-bill library for generating payment slips."""
+
+from .creditor import Creditor
+from .qr_bill import QRBill
+
+__all__ = ["Creditor", "QRBill"]

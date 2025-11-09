@@ -1,0 +1,108 @@
+"""QR-bill generation for Swiss payment standards."""
+
+from decimal import Decimal
+from .creditor import Creditor
+
+
+class QRBill:
+    """Swiss QR-bill generator.
+
+    Generates QR-bill data structures compliant with Swiss payment standards.
+    """
+
+    def __init__(
+        self,
+        account: str,
+        creditor: Creditor,
+        currency: str,
+        amount: Decimal | None = None,
+        reference_type: str = "NON",
+        reference: str | None = None,
+        additional_information: str | None = None,
+        debtor: "Debtor | None" = None,
+    ):
+        """Initialize a QR-bill.
+
+        Args:
+            account: IBAN or QR-IBAN (21 characters)
+            creditor: Creditor information
+            currency: Currency code (CHF or EUR)
+            amount: Payment amount (optional)
+            reference_type: Reference type (QRR, SCOR, or NON)
+            reference: Payment reference (optional)
+            additional_information: Unstructured message (optional)
+            debtor: Ultimate debtor information (optional)
+        """
+        self.account = account
+        self.creditor = creditor
+        self.currency = currency
+        self.amount = amount
+        self.reference_type = reference_type
+        self.reference = reference or ""
+        self.additional_information = additional_information or ""
+        self.debtor = debtor
+
+    def build_data_string(self) -> str:
+        """Build the QR code data string.
+
+        Returns:
+            QR code data string with elements separated by newlines.
+        """
+        elements = []
+
+        # Header (mandatory)
+        elements.append("SPC")  # QR type
+        elements.append("0200")  # Version
+        elements.append("1")  # Coding type (UTF-8)
+
+        # Creditor information (mandatory)
+        elements.append(self.account)  # IBAN
+
+        # Creditor address
+        elements.append("S")  # Address type (structured)
+        elements.append(self.creditor.name)
+        elements.append(self.creditor.street)
+        elements.append(self.creditor.building_number)
+        elements.append(self.creditor.postal_code)
+        elements.append(self.creditor.city)
+        elements.append(self.creditor.country)
+
+        # Ultimate Creditor (reserved for future use - 7 empty fields)
+        for _ in range(7):
+            elements.append("")
+
+        # Payment amount information
+        if self.amount is not None:
+            elements.append(f"{self.amount:.2f}")
+        else:
+            elements.append("")
+        elements.append(self.currency)
+
+        # Ultimate Debtor (optional - 7 fields)
+        if self.debtor:
+            elements.append("S")  # Address type
+            elements.append(self.debtor.name)
+            elements.append(self.debtor.street)
+            elements.append(self.debtor.building_number)
+            elements.append(self.debtor.postal_code)
+            elements.append(self.debtor.city)
+            elements.append(self.debtor.country)
+        else:
+            for _ in range(7):
+                elements.append("")
+
+        # Payment reference
+        elements.append(self.reference_type)
+        elements.append(self.reference)
+
+        # Additional information
+        elements.append(self.additional_information)  # Unstructured message
+        elements.append("EPD")  # Trailer (End Payment Data)
+
+        # Billing information (optional)
+        # For now, we don't include it
+
+        # Alternative procedures (optional)
+        # For now, we don't include them
+
+        return "\n".join(elements)

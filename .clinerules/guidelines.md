@@ -10,7 +10,7 @@
 
 - Write tests **before** implementing features
 - Use `pytest` for all tests
-- Run tests: `pytest` or `pytest tests/`
+- Run tests: `uv run pytest`
 - Aim for high test coverage
 
 ### Code Structure
