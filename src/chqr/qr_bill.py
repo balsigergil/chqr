@@ -3,7 +3,12 @@
 from decimal import Decimal
 from .creditor import Creditor
 from .debtor import UltimateDebtor
-from .validators import validate_iban
+from .validators import (
+    validate_iban,
+    validate_reference_type,
+    validate_qr_reference,
+    validate_creditor_reference,
+)
 
 
 class QRBill:
@@ -40,6 +45,15 @@ class QRBill:
         """
         # Validate IBAN
         validate_iban(account)
+
+        # Validate reference type matches account type
+        validate_reference_type(account, reference_type)
+
+        # Validate reference format if provided
+        if reference_type == "QRR" and reference:
+            validate_qr_reference(reference)
+        elif reference_type == "SCOR" and reference:
+            validate_creditor_reference(reference)
 
         self.account = account
         self.creditor = creditor

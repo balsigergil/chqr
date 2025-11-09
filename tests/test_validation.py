@@ -100,150 +100,141 @@ class TestReferenceValidation:
 
     def test_qr_iban_requires_qrr_reference(self):
         """Test that QR-IBAN must use QRR reference type."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # QR-IBAN with wrong reference type
-        # with pytest.raises(ValidationError, match="QR-IBAN.*QRR"):
-        #     QRBill(
-        #         account="CH4431999123000889012",  # QR-IBAN
-        #         creditor=creditor,
-        #         currency="CHF",
-        #         reference_type="SCOR"  # Wrong!
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # QR-IBAN with wrong reference type
+        with pytest.raises(ValidationError, match="QR-IBAN.*QRR"):
+            QRBill(
+                account="CH4431999123000889012",  # QR-IBAN
+                creditor=creditor,
+                currency="CHF",
+                reference_type="SCOR",  # Wrong!
+            )
 
     def test_iban_cannot_use_qrr_reference(self):
         """Test that regular IBAN cannot use QRR reference type."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Regular IBAN with QRR reference
-        # with pytest.raises(ValidationError, match="IBAN.*SCOR.*NON"):
-        #     QRBill(
-        #         account="CH5800791123000889012",  # Regular IBAN
-        #         creditor=creditor,
-        #         currency="CHF",
-        #         reference_type="QRR"  # Wrong!
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Regular IBAN with QRR reference
+        with pytest.raises(ValidationError, match="IBAN.*SCOR.*NON"):
+            QRBill(
+                account="CH5800791123000889012",  # Regular IBAN
+                creditor=creditor,
+                currency="CHF",
+                reference_type="QRR",  # Wrong!
+            )
 
     def test_qr_reference_format(self):
         """Test QR reference must be 27 digits."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Too short
-        # with pytest.raises(ValidationError, match="27.*digits"):
-        #     QRBill(
-        #         account="CH4431999123000889012",
-        #         creditor=creditor,
-        #         currency="CHF",
-        #         reference_type="QRR",
-        #         reference="12345678901234567890123456"  # 26 digits
-        #     )
-        #
-        # # Contains letters
-        # with pytest.raises(ValidationError, match="numeric"):
-        #     QRBill(
-        #         account="CH4431999123000889012",
-        #         creditor=creditor,
-        #         currency="CHF",
-        #         reference_type="QRR",
-        #         reference="1234567890123456789012345A"  # Has letter
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid: 27 digits
+        qr_bill = QRBill(
+            account="CH4431999123000889012",
+            creditor=creditor,
+            currency="CHF",
+            reference_type="QRR",
+            reference="210000000003139471430009017",  # Valid 27 digits
+        )
+        assert qr_bill.reference == "210000000003139471430009017"
+
+        # Too short
+        with pytest.raises(ValidationError, match="27.*digits"):
+            QRBill(
+                account="CH4431999123000889012",
+                creditor=creditor,
+                currency="CHF",
+                reference_type="QRR",
+                reference="12345678901234567890123456",  # 26 digits
+            )
+
+        # Contains letters
+        with pytest.raises(ValidationError, match="numeric"):
+            QRBill(
+                account="CH4431999123000889012",
+                creditor=creditor,
+                currency="CHF",
+                reference_type="QRR",
+                reference="1234567890123456789012345A",  # Has letter
+            )
 
     def test_qr_reference_check_digit(self):
         """Test QR reference check digit validation."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Invalid check digit (last digit should be 7)
-        # with pytest.raises(ValidationError, match="check digit"):
-        #     QRBill(
-        #         account="CH4431999123000889012",
-        #         creditor=creditor,
-        #         currency="CHF",
-        #         reference_type="QRR",
-        #         reference="210000000003139471430009018"  # Wrong check digit
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid check digit (from spec example)
+        qr_bill = QRBill(
+            account="CH4431999123000889012",
+            creditor=creditor,
+            currency="CHF",
+            reference_type="QRR",
+            reference="210000000003139471430009017",  # Valid (check digit = 7)
+        )
+        assert qr_bill.reference == "210000000003139471430009017"
+
+        # Invalid check digit (last digit should be 7, not 8)
+        with pytest.raises(ValidationError, match="check digit"):
+            QRBill(
+                account="CH4431999123000889012",
+                creditor=creditor,
+                currency="CHF",
+                reference_type="QRR",
+                reference="210000000003139471430009018",  # Wrong check digit
+            )
 
     def test_creditor_reference_format(self):
         """Test Creditor Reference (ISO 11649) format validation."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Valid SCOR reference
-        # qr_bill = QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     currency="CHF",
-        #     reference_type="SCOR",
-        #     reference="RF18539007547034"
-        # )
-        #
-        # # Invalid: doesn't start with RF
-        # with pytest.raises(ValidationError, match="RF"):
-        #     QRBill(
-        #         account="CH5800791123000889012",
-        #         creditor=creditor,
-        #         currency="CHF",
-        #         reference_type="SCOR",
-        #         reference="XX18539007547034"
-        #     )
-        #
-        # # Invalid: too short (min 5 chars)
-        # with pytest.raises(ValidationError, match="5.*25"):
-        #     QRBill(
-        #         account="CH5800791123000889012",
-        #         creditor=creditor,
-        #         currency="CHF",
-        #         reference_type="SCOR",
-        #         reference="RF12"
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid SCOR reference
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+            reference_type="SCOR",
+            reference="RF18539007547034",
+        )
+        assert qr_bill.reference == "RF18539007547034"
+
+        # Invalid: doesn't start with RF
+        with pytest.raises(ValidationError, match="RF"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                currency="CHF",
+                reference_type="SCOR",
+                reference="XX18539007547034",
+            )
+
+        # Invalid: too short (min 5 chars)
+        with pytest.raises(ValidationError, match="5.*25"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                currency="CHF",
+                reference_type="SCOR",
+                reference="RF12",
+            )
 
 
 class TestAmountValidation:
