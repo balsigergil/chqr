@@ -3,14 +3,15 @@
 import pytest
 from decimal import Decimal
 
+from chqr import QRBill, Creditor, ValidationError
+from chqr.validators import is_qr_iban
+
 
 class TestIBANValidation:
     """Test IBAN validation rules."""
 
     def test_valid_swiss_iban(self):
         """Test that valid Swiss IBAN is accepted."""
-        from chqr import QRBill, Creditor
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -23,8 +24,6 @@ class TestIBANValidation:
 
     def test_invalid_iban_format(self):
         """Test that invalid IBAN format is rejected."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -34,8 +33,6 @@ class TestIBANValidation:
 
     def test_iban_wrong_length(self):
         """Test that IBAN with wrong length is rejected."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -49,8 +46,6 @@ class TestIBANValidation:
 
     def test_non_swiss_iban_rejected(self):
         """Test that non-CH/LI IBAN is rejected."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -64,16 +59,12 @@ class TestIBANValidation:
 
     def test_qr_iban_identification(self):
         """Test that QR-IBAN is correctly identified."""
-        from chqr.validators import is_qr_iban
-
         # QR-IID range: 30000-31999
         assert is_qr_iban("CH4431999123000889012") is True  # QR-IID: 31999
         assert is_qr_iban("CH5800791123000889012") is False  # Regular IID
 
     def test_iban_checksum_validation(self):
         """Test that IBAN checksum is validated using MOD97."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -100,8 +91,6 @@ class TestReferenceValidation:
 
     def test_qr_iban_requires_qrr_reference(self):
         """Test that QR-IBAN must use QRR reference type."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -117,8 +106,6 @@ class TestReferenceValidation:
 
     def test_iban_cannot_use_qrr_reference(self):
         """Test that regular IBAN cannot use QRR reference type."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -134,8 +121,6 @@ class TestReferenceValidation:
 
     def test_qr_reference_format(self):
         """Test QR reference must be 27 digits."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -172,8 +157,6 @@ class TestReferenceValidation:
 
     def test_qr_reference_check_digit(self):
         """Test QR reference check digit validation."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -200,8 +183,6 @@ class TestReferenceValidation:
 
     def test_creditor_reference_format(self):
         """Test Creditor Reference (ISO 11649) format validation."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -242,8 +223,6 @@ class TestAmountValidation:
 
     def test_amount_format_two_decimals(self):
         """Test amount must have exactly 2 decimal places."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -274,8 +253,6 @@ class TestAmountValidation:
 
     def test_amount_minimum(self):
         """Test amount validation for minimum values."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -309,8 +286,6 @@ class TestAmountValidation:
 
     def test_amount_maximum(self):
         """Test amount must not exceed 999,999,999.99."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -334,8 +309,6 @@ class TestAmountValidation:
 
     def test_currency_validation(self):
         """Test only CHF and EUR are allowed."""
-        from chqr import QRBill, Creditor, ValidationError
-
         creditor = Creditor(
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
@@ -370,8 +343,6 @@ class TestAddressValidation:
 
     def test_name_max_length(self):
         """Test name cannot exceed 70 characters."""
-        from chqr import Creditor, ValidationError
-
         # Valid: 70 characters
         Creditor(name="A" * 70, postal_code="8000", city="Zurich", country="CH")
 
@@ -381,8 +352,6 @@ class TestAddressValidation:
 
     def test_required_address_fields(self):
         """Test that name, postal code, city, and country are required."""
-        from chqr import Creditor, ValidationError
-
         # Empty name
         with pytest.raises(ValidationError, match="Name"):
             Creditor(name="", postal_code="8000", city="Zurich", country="CH")
@@ -401,8 +370,6 @@ class TestAddressValidation:
 
     def test_country_code_format(self):
         """Test country must be 2-character ISO 3166-1 code."""
-        from chqr import Creditor, ValidationError
-
         # Valid
         Creditor(name="Test", postal_code="8000", city="Zurich", country="CH")
 
@@ -416,8 +383,6 @@ class TestCharacterSetValidation:
 
     def test_valid_characters_accepted(self):
         """Test that allowed Unicode characters are accepted."""
-        from chqr import Creditor
-
         # Basic Latin, Latin-1 Supplement, Latin Extended A
         Creditor(name="Müller & Söhne", postal_code="8000", city="Zürich", country="CH")
 
@@ -429,8 +394,6 @@ class TestCharacterSetValidation:
 
     def test_invalid_characters_rejected(self):
         """Test that non-Latin characters are rejected."""
-        from chqr import Creditor, ValidationError
-
         # Cyrillic
         with pytest.raises(ValidationError, match="character"):
             Creditor(name="Тест", postal_code="8000", city="Zurich", country="CH")
