@@ -45,6 +45,45 @@ class TestQRDataStructure:
         assert lines[9] == "Zurich"
         assert lines[10] == "CH"
 
+    def test_qr_data_with_debtor(self):
+        """Test QR data structure including ultimate debtor."""
+        from chqr import QRBill, Creditor, UltimateDebtor
+
+        creditor = Creditor(
+            name="Test Company AG",
+            postal_code="8000",
+            city="Zurich",
+            country="CH",
+        )
+
+        debtor = UltimateDebtor(
+            name="Max Muster",
+            street="Musterstrasse",
+            building_number="10",
+            postal_code="3000",
+            city="Bern",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+            debtor=debtor,
+        )
+
+        data = qr_bill.build_data_string()
+        lines = data.split("\n")
+
+        # Ultimate Debtor info should start at line 20
+        assert lines[20] == "S"  # Address type
+        assert lines[21] == "Max Muster"
+        assert lines[22] == "Musterstrasse"
+        assert lines[23] == "10"
+        assert lines[24] == "3000"
+        assert lines[25] == "Bern"
+        assert lines[26] == "CH"
+
     def test_qr_data_with_amount(self):
         """Test QR data structure including amount."""
         pytest.skip("Not implemented yet")
