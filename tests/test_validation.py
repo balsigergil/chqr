@@ -70,6 +70,30 @@ class TestIBANValidation:
         assert is_qr_iban("CH4431999123000889012") is True  # QR-IID: 31999
         assert is_qr_iban("CH5800791123000889012") is False  # Regular IID
 
+    def test_iban_checksum_validation(self):
+        """Test that IBAN checksum is validated using MOD97."""
+        from chqr import QRBill, Creditor, ValidationError
+
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid IBAN with correct checksum
+        qr_bill = QRBill(
+            account="CH9300762011623852957",  # Valid checksum
+            creditor=creditor,
+            currency="CHF",
+        )
+        assert qr_bill.account == "CH9300762011623852957"
+
+        # Invalid IBAN with wrong checksum (changed last digit from 93 to 00)
+        with pytest.raises(ValidationError, match="checksum"):
+            QRBill(
+                account="CH0000762011623852957",  # Invalid checksum
+                creditor=creditor,
+                currency="CHF",
+            )
+
 
 class TestReferenceValidation:
     """Test reference type and number validation."""

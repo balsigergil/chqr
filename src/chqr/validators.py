@@ -27,6 +27,31 @@ def is_qr_iban(iban: str) -> bool:
         return False
 
 
+def _validate_iban_checksum(iban: str) -> bool:
+    """Validate IBAN checksum using MOD97 algorithm.
+
+    Args:
+        iban: The IBAN to validate (without spaces)
+
+    Returns:
+        True if checksum is valid, False otherwise
+    """
+    # Move first 4 characters to the end
+    rearranged = iban[4:] + iban[:4]
+
+    # Replace letters with numbers (A=10, B=11, ..., Z=35)
+    numeric_string = ""
+    for char in rearranged:
+        if char.isdigit():
+            numeric_string += char
+        else:
+            # Convert letter to number (A=10, B=11, etc.)
+            numeric_string += str(ord(char) - ord("A") + 10)
+
+    # Calculate MOD97
+    return int(numeric_string) % 97 == 1
+
+
 def validate_iban(iban: str) -> None:
     """Validate Swiss/Liechtenstein IBAN format.
 
@@ -60,3 +85,7 @@ def validate_iban(iban: str) -> None:
         raise ValidationError(
             "IBAN format invalid. Must be 2 letters followed by 19 digits"
         )
+
+    # Validate checksum using MOD97
+    if not _validate_iban_checksum(iban_clean):
+        raise ValidationError("IBAN checksum is invalid")
