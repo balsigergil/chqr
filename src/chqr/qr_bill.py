@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from .creditor import Creditor
+from .debtor import UltimateDebtor
 
 
 class QRBill:
@@ -19,7 +20,7 @@ class QRBill:
         reference_type: str = "NON",
         reference: str | None = None,
         additional_information: str | None = None,
-        debtor: "Debtor | None" = None,
+        debtor: UltimateDebtor | None = None,
     ):
         """Initialize a QR-bill.
 
@@ -59,7 +60,7 @@ class QRBill:
         elements.append(self.account)  # IBAN
 
         # Creditor address
-        elements.append("S")  # Address type (structured)
+        elements.append("S")  # Address type (structured), required since November 2025
         elements.append(self.creditor.name)
         elements.append(self.creditor.street)
         elements.append(self.creditor.building_number)
