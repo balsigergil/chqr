@@ -7,7 +7,9 @@ authors = [
     { name = "Gil Balsiger", email = "gil.balsiger@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "qrcode>=8.2",
+]
 
 [build-system]
 requires = ["uv_build>=0.9.8,<0.10.0"]

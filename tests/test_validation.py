@@ -9,97 +9,66 @@ class TestIBANValidation:
 
     def test_valid_swiss_iban(self):
         """Test that valid Swiss IBAN is accepted."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Should not raise
-        # qr_bill = QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     currency="CHF"
-        # )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Should not raise
+        qr_bill = QRBill(
+            account="CH5800791123000889012", creditor=creditor, currency="CHF"
+        )
+        assert qr_bill.account == "CH5800791123000889012"
 
     def test_invalid_iban_format(self):
         """Test that invalid IBAN format is rejected."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # with pytest.raises(ValidationError, match="IBAN"):
-        #     QRBill(
-        #         account="INVALID",
-        #         creditor=creditor,
-        #         currency="CHF"
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        with pytest.raises(ValidationError, match="IBAN"):
+            QRBill(account="INVALID", creditor=creditor, currency="CHF")
 
     def test_iban_wrong_length(self):
         """Test that IBAN with wrong length is rejected."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # with pytest.raises(ValidationError, match="21 characters"):
-        #     QRBill(
-        #         account="CH58007911230008890",  # Too short
-        #         creditor=creditor,
-        #         currency="CHF"
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        with pytest.raises(ValidationError, match="21 characters"):
+            QRBill(
+                account="CH58007911230008890",  # Too short
+                creditor=creditor,
+                currency="CHF",
+            )
 
     def test_non_swiss_iban_rejected(self):
         """Test that non-CH/LI IBAN is rejected."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # with pytest.raises(ValidationError, match="CH or LI"):
-        #     QRBill(
-        #         account="DE89370400440532013000",  # German IBAN
-        #         creditor=creditor,
-        #         currency="CHF"
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        with pytest.raises(ValidationError, match="CH or LI"):
+            QRBill(
+                account="DE89370400440532013000",  # German IBAN
+                creditor=creditor,
+                currency="CHF",
+            )
 
     def test_qr_iban_identification(self):
         """Test that QR-IBAN is correctly identified."""
-        pytest.skip("Not implemented yet")
+        from chqr.validators import is_qr_iban
 
-        # from chqr.validators import is_qr_iban
-        #
-        # # QR-IID range: 30000-31999
-        # assert is_qr_iban("CH4431999123000889012") is True  # QR-IID: 31999
-        # assert is_qr_iban("CH5800791123000889012") is False  # Regular IID
+        # QR-IID range: 30000-31999
+        assert is_qr_iban("CH4431999123000889012") is True  # QR-IID: 31999
+        assert is_qr_iban("CH5800791123000889012") is False  # Regular IID
 
 
 class TestReferenceValidation:

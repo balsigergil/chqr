@@ -3,6 +3,7 @@
 from decimal import Decimal
 from .creditor import Creditor
 from .debtor import UltimateDebtor
+from .validators import validate_iban
 
 
 class QRBill:
@@ -33,7 +34,13 @@ class QRBill:
             reference: Payment reference (optional)
             additional_information: Unstructured message (optional)
             debtor: Ultimate debtor information (optional)
+
+        Raises:
+            ValidationError: If any input data is invalid
         """
+        # Validate IBAN
+        validate_iban(account)
+
         self.account = account
         self.creditor = creditor
         self.currency = currency

@@ -9,33 +9,32 @@ tests/
 ├── README.md                   # This file
 ├── test_data_structure.py      # Data structure building tests
 ├── test_validation.py          # Input validation tests
-├── test_qr_generation.py       # QR code generation & SVG tests
-└── test_qr_bill.py            # Legacy file (to be updated)
+└── test_qr_generation.py       # QR code generation & SVG tests
 ```
 
 ## Running Tests
 
 ```bash
 # Run all tests
-pytest
+uv run pytest
 
 # Run specific test file
-pytest tests/test_data_structure.py
+uv run pytest tests/test_data_structure.py
 
 # Run specific test class
-pytest tests/test_validation.py::TestIBANValidation
+uv run pytest tests/test_validation.py::TestIBANValidation
 
 # Run specific test
-pytest tests/test_data_structure.py::TestQRDataStructure::test_minimal_qr_data_structure
+uv run pytest tests/test_data_structure.py::TestQRDataStructure::test_minimal_qr_data_structure
 
 # Run with verbose output
-pytest -v
+uv run pytest -v
 
 # Run with coverage
-pytest --cov=chqr --cov-report=html
+uv run pytest --cov=chqr --cov-report=html
 
 # Skip skipped tests (show only failures/passes)
-pytest --tb=short
+uv run pytest --tb=short
 ```
 
 ## Test Categories

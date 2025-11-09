@@ -88,5 +88,5 @@ pytest -v
 
 - Format with Ruff
 - Use type hints for all public APIs
-- Document all public classes and methods
+- Document all public classes and methods using Google-style docstrings
 - Keep functions focused and testable
