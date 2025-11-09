@@ -376,90 +376,45 @@ class TestAddressValidation:
 
     def test_name_max_length(self):
         """Test name cannot exceed 70 characters."""
-        pytest.skip("Not implemented yet")
+        from chqr import Creditor, ValidationError
 
-        # from chqr import Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # # Valid: 70 characters
-        # Creditor(
-        #     name="A" * 70,
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Invalid: 71 characters
-        # with pytest.raises(ValidationError, match="70"):
-        #     Creditor(
-        #         name="A" * 71,
-        #         postal_code="8000",
-        #         city="Zurich",
-        #         country="CH"
-        #     )
+        # Valid: 70 characters
+        Creditor(name="A" * 70, postal_code="8000", city="Zurich", country="CH")
+
+        # Invalid: 71 characters
+        with pytest.raises(ValidationError, match="70"):
+            Creditor(name="A" * 71, postal_code="8000", city="Zurich", country="CH")
 
     def test_required_address_fields(self):
         """Test that name, postal code, city, and country are required."""
-        pytest.skip("Not implemented yet")
+        from chqr import Creditor, ValidationError
 
-        # from chqr import Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # # Missing name
-        # with pytest.raises(ValidationError, match="name"):
-        #     Creditor(
-        #         postal_code="8000",
-        #         city="Zurich",
-        #         country="CH"
-        #     )
-        #
-        # # Missing postal code
-        # with pytest.raises(ValidationError, match="postal"):
-        #     Creditor(
-        #         name="Test",
-        #         city="Zurich",
-        #         country="CH"
-        #     )
-        #
-        # # Missing city
-        # with pytest.raises(ValidationError, match="city"):
-        #     Creditor(
-        #         name="Test",
-        #         postal_code="8000",
-        #         country="CH"
-        #     )
-        #
-        # # Missing country
-        # with pytest.raises(ValidationError, match="country"):
-        #     Creditor(
-        #         name="Test",
-        #         postal_code="8000",
-        #         city="Zurich"
-        #     )
+        # Empty name
+        with pytest.raises(ValidationError, match="Name"):
+            Creditor(name="", postal_code="8000", city="Zurich", country="CH")
+
+        # Empty postal code
+        with pytest.raises(ValidationError, match="Postal code"):
+            Creditor(name="Test", postal_code="", city="Zurich", country="CH")
+
+        # Empty city
+        with pytest.raises(ValidationError, match="City"):
+            Creditor(name="Test", postal_code="8000", city="", country="CH")
+
+        # Empty country
+        with pytest.raises(ValidationError, match="Country"):
+            Creditor(name="Test", postal_code="8000", city="Zurich", country="")
 
     def test_country_code_format(self):
         """Test country must be 2-character ISO 3166-1 code."""
-        pytest.skip("Not implemented yet")
+        from chqr import Creditor, ValidationError
 
-        # from chqr import Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # # Valid
-        # Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Invalid: too long
-        # with pytest.raises(ValidationError, match="2.*character"):
-        #     Creditor(
-        #         name="Test",
-        #         postal_code="8000",
-        #         city="Zurich",
-        #         country="CHE"
-        #     )
+        # Valid
+        Creditor(name="Test", postal_code="8000", city="Zurich", country="CH")
+
+        # Invalid: too long
+        with pytest.raises(ValidationError, match="2.*character"):
+            Creditor(name="Test", postal_code="8000", city="Zurich", country="CHE")
 
 
 class TestCharacterSetValidation:

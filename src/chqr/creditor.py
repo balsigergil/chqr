@@ -1,5 +1,7 @@
 """Creditor address information for QR-bills."""
 
+from .validators import validate_address_field, validate_country_code
+
 
 class Creditor:
     """Creditor information for a QR-bill.
@@ -25,7 +27,20 @@ class Creditor:
             country: Two-character ISO 3166-1 country code
             street: Street name or P.O. Box (max 70 characters, optional)
             building_number: Building number (max 16 characters, optional)
+
+        Raises:
+            ValidationError: If any field is invalid
         """
+        # Validate required fields
+        validate_address_field("Name", name, 70, required=True)
+        validate_address_field("Postal code", postal_code, 16, required=True)
+        validate_address_field("City", city, 35, required=True)
+        validate_country_code(country)
+
+        # Validate optional fields
+        validate_address_field("Street", street, 70, required=False)
+        validate_address_field("Building number", building_number, 16, required=False)
+
         self.name = name
         self.postal_code = postal_code
         self.city = city

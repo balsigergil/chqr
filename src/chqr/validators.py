@@ -258,3 +258,52 @@ def validate_amount(amount: Decimal | None, currency: str) -> None:
 
     # Note: 0.00 is valid for notification-only QR-bills
     # Minimum payment amount is 0.01, but we allow 0.00
+
+
+def validate_address_field(
+    field_name: str, value: str | None, max_length: int, required: bool = True
+) -> None:
+    """Validate an address field.
+
+    Args:
+        field_name: Name of the field (for error messages)
+        value: The field value to validate
+        max_length: Maximum allowed length
+        required: Whether the field is required
+
+    Raises:
+        ValidationError: If the field is invalid
+    """
+    if required and not value:
+        raise ValidationError(f"{field_name} is required")
+
+    if value and len(value) > max_length:
+        raise ValidationError(
+            f"{field_name} cannot exceed {max_length} characters, got {len(value)}"
+        )
+
+
+def validate_country_code(country: str) -> None:
+    """Validate country code.
+
+    Must be a 2-character ISO 3166-1 code.
+
+    Args:
+        country: The country code to validate
+
+    Raises:
+        ValidationError: If country code is invalid
+    """
+    if not country:
+        raise ValidationError("Country is required")
+
+    if len(country) != 2:
+        raise ValidationError(
+            f"Country must be a 2-character ISO 3166-1 code, got {len(country)} characters"
+        )
+
+    if not country.isalpha():
+        raise ValidationError("Country code must contain only letters")
+
+    if not country.isupper():
+        raise ValidationError("Country code must be uppercase")
