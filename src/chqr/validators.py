@@ -1,6 +1,7 @@
 """Validation functions for QR-bill data."""
 
 import re
+from decimal import Decimal
 from .exceptions import ValidationError
 
 
@@ -196,3 +197,64 @@ def validate_qr_reference(reference: str) -> None:
         raise ValidationError(
             f"QR reference check digit is invalid. Expected {expected_check_digit}, got {check_digit}"
         )
+
+
+def validate_currency(currency: str) -> None:
+    """Validate currency code.
+
+    Only CHF and EUR are allowed for Swiss QR-bills.
+
+    Args:
+        currency: The currency code to validate
+
+    Raises:
+        ValidationError: If currency is not CHF or EUR
+    """
+    if not currency:
+        raise ValidationError("Currency is required")
+
+    if currency not in ("CHF", "EUR"):
+        raise ValidationError(f"Currency must be CHF or EUR, got {currency}")
+
+
+def validate_amount(amount: Decimal | None, currency: str) -> None:
+    """Validate payment amount.
+
+    Amount must be:
+    - Between 0.01 and 999,999,999.99 for regular payments
+    - 0.00 for notification-only QR-bills
+    - Have exactly 2 decimal places
+    - Not negative
+
+    Args:
+        amount: The amount to validate (can be None)
+        currency: The currency (for context in error messages)
+
+    Raises:
+        ValidationError: If amount is invalid
+    """
+    # Amount is optional (can be None)
+    if amount is None:
+        return
+
+    # Check for negative amounts
+    if amount < 0:
+        raise ValidationError(f"Amount cannot be negative, got {amount}")
+
+    # Check decimal places (must be exactly 2)
+    # We do this by checking if the amount equals itself when quantized to 2 decimals
+    quantized = amount.quantize(Decimal("0.01"))
+    if amount != quantized:
+        raise ValidationError(
+            f"Amount must have exactly 2 decimal places, got {amount}"
+        )
+
+    # Check maximum amount
+    max_amount = Decimal("999999999.99")
+    if amount > max_amount:
+        raise ValidationError(
+            f"Amount cannot exceed 999,999,999.99 {currency}, got {amount}"
+        )
+
+    # Note: 0.00 is valid for notification-only QR-bills
+    # Minimum payment amount is 0.01, but we allow 0.00

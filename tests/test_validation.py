@@ -242,103 +242,95 @@ class TestAmountValidation:
 
     def test_amount_format_two_decimals(self):
         """Test amount must have exactly 2 decimal places."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Valid amounts
-        # QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     amount=Decimal("100.00"),
-        #     currency="CHF"
-        # )
-        #
-        # QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     amount=Decimal("0.10"),
-        #     currency="CHF"
-        # )
-        #
-        # # Invalid: 3 decimal places
-        # with pytest.raises(ValidationError, match="2 decimal"):
-        #     QRBill(
-        #         account="CH5800791123000889012",
-        #         creditor=creditor,
-        #         amount=Decimal("100.001"),
-        #         currency="CHF"
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid amounts
+        QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("100.00"),
+            currency="CHF",
+        )
+
+        QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("0.10"),
+            currency="CHF",
+        )
+
+        # Invalid: 3 decimal places
+        with pytest.raises(ValidationError, match="2 decimal"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                amount=Decimal("100.001"),
+                currency="CHF",
+            )
 
     def test_amount_minimum(self):
-        """Test amount must be at least 0.01."""
-        pytest.skip("Not implemented yet")
+        """Test amount validation for minimum values."""
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Valid minimum
-        # QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     amount=Decimal("0.01"),
-        #     currency="CHF"
-        # )
-        #
-        # # Invalid: zero (unless notification-only)
-        # with pytest.raises(ValidationError, match="0.01"):
-        #     QRBill(
-        #         account="CH5800791123000889012",
-        #         creditor=creditor,
-        #         amount=Decimal("0.00"),
-        #         currency="CHF"
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid: minimum payment amount
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("0.01"),
+            currency="CHF",
+        )
+        assert qr_bill.amount == Decimal("0.01")
+
+        # Valid: zero for notification-only QR-bills
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("0.00"),
+            currency="CHF",
+        )
+        assert qr_bill.amount == Decimal("0.00")
+
+        # Invalid: negative amounts
+        with pytest.raises(ValidationError, match="negative"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                amount=Decimal("-0.01"),
+                currency="CHF",
+            )
 
     def test_amount_maximum(self):
         """Test amount must not exceed 999,999,999.99."""
-        pytest.skip("Not implemented yet")
+        from chqr import QRBill, Creditor, ValidationError
 
-        # from chqr import QRBill, Creditor
-        # from chqr.exceptions import ValidationError
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # # Valid maximum
-        # QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     amount=Decimal("999999999.99"),
-        #     currency="CHF"
-        # )
-        #
-        # # Invalid: too large
-        # with pytest.raises(ValidationError, match="999,999,999.99"):
-        #     QRBill(
-        #         account="CH5800791123000889012",
-        #         creditor=creditor,
-        #         amount=Decimal("1000000000.00"),
-        #         currency="CHF"
-        #     )
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid maximum
+        QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("999999999.99"),
+            currency="CHF",
+        )
+
+        # Invalid: too large
+        with pytest.raises(ValidationError, match="999,999,999.99"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                amount=Decimal("1000000000.00"),
+                currency="CHF",
+            )
 
     def test_currency_validation(self):
         """Test only CHF and EUR are allowed."""

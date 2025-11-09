@@ -8,6 +8,8 @@ from .validators import (
     validate_reference_type,
     validate_qr_reference,
     validate_creditor_reference,
+    validate_currency,
+    validate_amount,
 )
 
 
@@ -54,6 +56,10 @@ class QRBill:
             validate_qr_reference(reference)
         elif reference_type == "SCOR" and reference:
             validate_creditor_reference(reference)
+
+        # Validate currency and amount
+        validate_currency(currency)
+        validate_amount(amount, currency)
 
         self.account = account
         self.creditor = creditor
