@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Gil Balsiger", email = "gil.balsiger@gmail.com" }
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.9"
 dependencies = [
     "qrcode>=8.2",
 ]

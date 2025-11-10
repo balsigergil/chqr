@@ -3,7 +3,7 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^tests/fixtures/
+        exclude: ^(tests/fixtures|assets)/
       - id: end-of-file-fixer
         exclude: ^tests/fixtures/
       - id: check-yaml
