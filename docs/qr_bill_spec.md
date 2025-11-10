@@ -1,7 +1,7 @@
 # Swiss QR-bill Technical Specification
 
-**Version:** 2.3  
-**Valid from:** November 21, 2025  
+**Version:** 2.3
+**Valid from:** November 21, 2025
 **Document Type:** Developer Technical Reference
 
 ## 1. Overview
@@ -583,5 +583,5 @@ def validate_qr_reference(ref: str) -> bool:
 
 ---
 
-**Document Version**: Based on Implementation Guidelines v2.3 (November 21, 2025)  
+**Document Version**: Based on Implementation Guidelines v2.3 (November 21, 2025)
 **Target Audience**: Software developers implementing QR-bill generation/processing

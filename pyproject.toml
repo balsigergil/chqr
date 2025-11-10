@@ -17,7 +17,13 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.4.0",
     "pytest>=9.0.0",
     "pytest-cov>=7.0.0",
     "ruff>=0.14.4",
+]
+
+[tool.ruff]
+exclude = [
+    "tests/fixtures/",
 ]
