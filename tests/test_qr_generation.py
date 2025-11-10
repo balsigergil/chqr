@@ -163,53 +163,47 @@ class TestQRCodeParameters:
 
     def test_qr_code_error_correction_level(self):
         """Test QR code uses error correction level M."""
-        pytest.skip("Not implemented yet - requires qr code generation method")
+        import qrcode
 
-        # import qrcode
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # qr_bill = QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     currency="CHF"
-        # )
-        #
-        # # Generate QR code
-        # qr_code = qr_bill.generate_qr_code()
-        #
-        # # Error correction level M (~15% redundancy)
-        # assert qr_code.error_correction == qrcode.constants.ERROR_CORRECT_M
+        creditor = Creditor(
+            name="Test",
+            postal_code="8000",
+            city="Zurich",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+        )
+
+        # Generate QR code
+        qr_code = qr_bill.generate_qr_code()
+
+        # Error correction level M (~15% redundancy)
+        assert qr_code.error_correction == qrcode.constants.ERROR_CORRECT_M
 
     def test_qr_code_version_auto_select(self):
         """Test QR code version is auto-selected with max 25."""
-        pytest.skip("Not implemented yet - requires qr code generation method")
+        creditor = Creditor(
+            name="Test",
+            postal_code="8000",
+            city="Zurich",
+            country="CH",
+        )
 
-        # import qrcode
-        #
-        # creditor = Creditor(
-        #     name="Test",
-        #     postal_code="8000",
-        #     city="Zurich",
-        #     country="CH"
-        # )
-        #
-        # qr_bill = QRBill(
-        #     account="CH5800791123000889012",
-        #     creditor=creditor,
-        #     currency="CHF"
-        # )
-        #
-        # qr_code = qr_bill.generate_qr_code()
-        #
-        # # Version should be auto-selected (None before make, then assigned)
-        # # Maximum version is 25 (117x117 modules)
-        # assert qr_code.version is None or qr_code.version <= 25
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+        )
+
+        qr_code = qr_bill.generate_qr_code()
+
+        # Version should be auto-selected and <= 25 (117x117 modules)
+        assert qr_code.version is not None
+        assert qr_code.version <= 25
 
     def test_qr_data_string_is_utf8_compatible(self):
         """Test that data string can be encoded as UTF-8."""
