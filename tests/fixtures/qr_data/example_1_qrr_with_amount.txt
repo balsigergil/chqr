@@ -1,0 +1,31 @@
+SPC
+0200
+1
+CH6431961000004421557
+S
+Max Muster & Söhne
+Musterstrasse
+123
+8000
+Seldwyla
+CH
+
+
+
+
+
+
+
+50.00
+CHF
+S
+Simon Muster
+Musterstrasse
+1
+8000
+Seldwyla
+CH
+QRR
+000008207791225857421286694
+Payment of travel
+EPD

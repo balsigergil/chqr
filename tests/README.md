@@ -1,210 +1,134 @@
-# Testing Guide for chqr
+# Testing Strategy for chqr
 
-This directory contains the test suite for the chqr library following Test-Driven Development (TDD) principles.
+## QR Code Generation Testing
 
-## Test Structure
+### Approach
+
+The QR code generation is tested by comparing the **data string** that will be sent to the `qrcode` library with pre-generated fixtures. This approach has several advantages:
+
+1. **Deterministic**: Same inputs always produce the same output
+2. **Fast**: No need to render actual QR codes or decode images
+3. **Focused**: Tests the business logic separately from the rendering library
+4. **Library-agnostic**: Can swap QR libraries without changing tests
+
+### Test Structure
 
 ```
 tests/
-├── README.md                   # This file
-├── test_data_structure.py      # Data structure building tests
-├── test_validation.py          # Input validation tests
-└── test_qr_generation.py       # QR code generation & SVG tests
+├── test_qr_generation.py      # QR generation tests
+└── fixtures/
+    └── qr_data/                # Expected data string fixtures
+        ├── example_1_qrr_with_amount.txt
+        ├── example_3_scor_reference.txt
+        └── example_4_donation.txt
 ```
 
-## Running Tests
+### What Gets Tested
+
+#### 1. Data String Generation (`TestQRDataString`)
+
+Tests that `QRBill.build_data_string()` produces the exact data structure expected by the Swiss QR-bill specification:
+
+- **Example 1**: QR Reference with amount and debtor
+- **Example 3**: SCOR Reference (ISO 11649)
+- **Example 4**: Donation (no amount, no debtor)
+
+Each test:
+
+1. Creates a `QRBill` object with specific parameters
+2. Calls `build_data_string()` to generate the data
+3. Compares with the expected fixture file
+
+#### 2. QR Code Parameters (`TestQRCodeParameters`)
+
+Tests for when actual QR code generation is implemented:
+
+- Error correction level M (required by spec)
+- Version auto-selection (max 25)
+- UTF-8 encoding compatibility
+
+#### 3. Edge Cases (`TestEdgeCases`)
+
+Tests boundary conditions and special scenarios:
+
+- Minimum amount (0.01 CHF)
+- Maximum amount (999,999,999.99)
+- Special characters (umlauts, ampersands)
+- Empty fields (building numbers)
+- P.O. Box addresses
+
+### Running Tests
 
 ```bash
-# Run all tests
-uv run pytest
-
-# Run specific test file
-uv run pytest tests/test_data_structure.py
+# Run all QR generation tests
+uv run pytest tests/test_qr_generation.py -v
 
 # Run specific test class
-uv run pytest tests/test_validation.py::TestIBANValidation
-
-# Run specific test
-uv run pytest tests/test_data_structure.py::TestQRDataStructure::test_minimal_qr_data_structure
+uv run pytest tests/test_qr_generation.py::TestQRDataString -v
 
 # Run with verbose output
-uv run pytest -v
-
-# Run with coverage
-uv run pytest --cov=chqr --cov-report=html
-
-# Skip skipped tests (show only failures/passes)
-uv run pytest --tb=short
+uv run pytest tests/test_qr_generation.py -vv
 ```
 
-## Test Categories
+### Fixture Files
 
-### 1. Data Structure Tests (`test_data_structure.py`)
+Fixture files contain the exact string that `build_data_string()` should produce. They are:
 
-Tests the core QR code data string building:
+- Plain text files with newline-separated elements
+- Generated directly from `QRBill.build_data_string()` output
+- Match the Swiss QR-bill specification examples
 
-- Minimal valid structure
-- Optional fields handling
-- Element separators
-- Reserved fields (Ultimate Creditor)
-- Data length limits
-
-**Start here** when implementing - these are the foundation.
-
-### 2. Validation Tests (`test_validation.py`)
-
-Tests input validation and business rules:
-
-- IBAN format and validation
-- QR-IBAN identification
-- Reference type validation (QRR, SCOR, NON)
-- IBAN/Reference compatibility
-- Amount format and ranges
-- Currency validation
-- Address field validation
-- Character set restrictions
-
-### 3. QR Generation Tests (`test_qr_generation.py`)
-
-Tests QR code encoding and SVG output:
-
-- QR code parameters (error correction, version)
-- QR code decodability
-- SVG format and dimensions
-- Swiss cross overlay
-- Modulo 10 check digit calculation
-- Examples from specification
-
-## TDD Workflow
-
-1. **Pick a test** from one of the test files (start with `test_data_structure.py`)
-2. **Remove `pytest.skip()`** from the test
-3. **Uncomment the test code**
-4. **Run the test** - it should fail (Red)
-5. **Implement minimal code** to make it pass (Green)
-6. **Refactor** if needed while keeping tests green
-7. **Repeat** with the next test
-
-Example:
+To regenerate fixtures after code changes:
 
 ```python
-# Step 1-2: Enable the test
-def test_minimal_qr_data_structure(self):
-    """Test minimal valid QR-bill data structure."""
-    from chqr import QRBill, Creditor
+from decimal import Decimal
+from chqr import QRBill
+from chqr.creditor import Creditor
+from chqr.debtor import UltimateDebtor
 
-    creditor = Creditor(
-        name="Test Company AG",
-        postal_code="8000",
-        city="Zurich",
-        country="CH"
-    )
+# Create QRBill instance
+qr_bill = QRBill(...)
 
-    qr_bill = QRBill(
-        account="CH5800791123000889012",
-        creditor=creditor,
-        currency="CHF"
-    )
-
-    data = qr_bill.build_data_string()
-    lines = data.split('\n')
-
-    # Header
-    assert lines[0] == "SPC"
-    assert lines[1] == "0200"
-    assert lines[2] == "1"
-
-# Step 3: Run pytest - it will fail with ImportError
-# Step 4: Create the classes to make it pass
-# Step 5: Refactor once it's green
+# Generate and save fixture
+result = qr_bill.build_data_string()
+with open('tests/fixtures/qr_data/fixture_name.txt', 'w') as f:
+    f.write(result)
 ```
 
-## Test Implementation Order
+### Future Testing
 
-Recommended order for TDD:
+When QR code generation is implemented, additional tests will verify:
 
-### Phase 1: Core Data Structures
+1. **QR Code Properties**:
 
-1. `test_data_structure.py::test_minimal_qr_data_structure`
-2. `test_validation.py::test_valid_swiss_iban`
-3. `test_validation.py::test_required_address_fields`
+   - Error correction level M
+   - UTF-8 encoding
+   - Version ≤ 25
+   - 46×46 mm fixed size
 
-### Phase 2: Basic Validation
+2. **SVG Output**:
 
-4. `test_validation.py::test_invalid_iban_format`
-5. `test_validation.py::test_currency_validation`
-6. `test_validation.py::test_qr_iban_identification`
+   - Valid XML structure
+   - Correct dimensions
+   - Swiss cross overlay (7×7 mm)
+   - Proper viewBox attribute
 
-### Phase 3: References
+3. **Decoding** (optional):
+   - Generated QR codes can be decoded back to original data
+   - Requires additional dependencies (pyzbar or similar)
 
-7. `test_validation.py::test_qr_iban_requires_qrr_reference`
-8. `test_qr_generation.py::test_calculate_check_digit_example_1`
-9. `test_validation.py::test_qr_reference_check_digit`
+## Test-Driven Development Workflow
 
-### Phase 4: QR Code Generation
+1. Write test with expected behavior
+2. Run test (it should fail)
+3. Implement feature
+4. Run test (it should pass)
+5. Refactor if needed
+6. Repeat
 
-10. `test_qr_generation.py::test_qr_code_error_correction_level`
-11. `test_qr_generation.py::test_svg_is_valid_xml`
-12. `test_qr_generation.py::test_svg_dimensions`
+This ensures:
 
-### Phase 5: Complete Examples
-
-13. `test_qr_generation.py::test_example_1_from_spec`
-14. `test_qr_generation.py::test_example_3_from_spec`
-
-## Dependencies for Testing
-
-Some tests require additional libraries:
-
-```bash
-# For QR code decoding tests (optional)
-pip install pyzbar pillow
-
-# For SVG to PNG conversion (optional)
-pip install cairosvg
-
-# For coverage reports
-pip install pytest-cov
-```
-
-## Writing New Tests
-
-Follow these guidelines:
-
-1. **One concept per test** - Test one thing at a time
-2. **Clear names** - Test name should describe what it tests
-3. **AAA pattern** - Arrange, Act, Assert
-4. **Good docstrings** - Explain what is being tested
-5. **Use fixtures** - For repeated setup (add to `conftest.py`)
-
-Example:
-
-```python
-def test_specific_feature(self):
-    """Test that feature X works correctly with input Y."""
-    # Arrange
-    creditor = Creditor(name="Test", ...)
-    qr_bill = QRBill(account="...", creditor=creditor)
-
-    # Act
-    result = qr_bill.some_method()
-
-    # Assert
-    assert result == expected_value
-```
-
-## Reference
-
-- **Specification**: `docs/qr_bill_spec.md`
-- **Guidelines**: `.clinerules/guidelines.md`
-- **Original PDF**: `docs/ig-qr-bill-v2.3-en.pdf`
-
-## Tips
-
-- All tests are currently skipped - **this is intentional for TDD**
-- Enable tests one at a time as you implement features
-- Use `pytest -k "test_name"` to run tests matching a pattern
-- Use `pytest --lf` to run only last failed tests
-- Use `pytest -x` to stop on first failure
-
-Happy testing! 🧪
+- All features have tests
+- Tests guide implementation
+- High code coverage
+- Confidence in changes

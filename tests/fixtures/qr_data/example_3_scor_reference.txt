@@ -1,0 +1,31 @@
+SPC
+0200
+1
+CH5800791123000889012
+S
+Muster Krankenkasse
+Musterstrasse
+12
+8000
+Seldwyla
+CH
+
+
+
+
+
+
+
+211.00
+CHF
+S
+Sarah Beispiel
+Musterstrasse
+1
+8000
+Seldwyla
+CH
+SCOR
+RF720191230100405JSH0438
+
+EPD
