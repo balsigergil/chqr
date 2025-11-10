@@ -29,6 +29,8 @@ class QRBill:
         reference: str | None = None,
         additional_information: str | None = None,
         debtor: UltimateDebtor | None = None,
+        billing_information: str | None = None,
+        alternative_procedures: list[str] | None = None,
     ):
         """Initialize a QR-bill.
 
@@ -41,6 +43,8 @@ class QRBill:
             reference: Payment reference (optional)
             additional_information: Unstructured message (optional)
             debtor: Ultimate debtor information (optional)
+            billing_information: Structured billing information (optional, max 140 chars)
+            alternative_procedures: List of alternative procedures (optional, max 2, 100 chars each)
 
         Raises:
             ValidationError: If any input data is invalid
@@ -69,6 +73,8 @@ class QRBill:
         self.reference = reference or ""
         self.additional_information = additional_information or ""
         self.debtor = debtor
+        self.billing_information = billing_information or ""
+        self.alternative_procedures = alternative_procedures or []
 
     def build_data_string(self) -> str:
         """Build the QR code data string.
@@ -128,9 +134,12 @@ class QRBill:
         elements.append("EPD")  # Trailer (End Payment Data)
 
         # Billing information (optional)
-        # For now, we don't include it
+        if self.billing_information:
+            elements.append(self.billing_information)
 
-        # Alternative procedures (optional)
-        # For now, we don't include them
+        # Alternative procedures (optional, max 2)
+        if self.alternative_procedures:
+            for procedure in self.alternative_procedures[:2]:  # Max 2 procedures
+                elements.append(procedure)
 
         return "\n".join(elements)

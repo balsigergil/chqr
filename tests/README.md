@@ -30,6 +30,7 @@ tests/
 Tests that `QRBill.build_data_string()` produces the exact data structure expected by the Swiss QR-bill specification:
 
 - **Example 1**: QR Reference with amount and debtor
+- **Example 2**: With billing information and alternative procedures
 - **Example 3**: SCOR Reference (ISO 11649)
 - **Example 4**: Donation (no amount, no debtor)
 

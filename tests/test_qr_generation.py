@@ -57,45 +57,43 @@ class TestQRDataString:
 
     def test_example_2_with_billing_info_and_alt_procedure(self):
         """Test example 2: With billing information and alternative procedure."""
-        pytest.skip("Not implemented yet - requires billing info and alt procedures")
+        creditor = Creditor(
+            name="Max Muster & Söhne",
+            street="Musterstrasse",
+            building_number="123",
+            postal_code="8000",
+            city="Seldwyla",
+            country="CH",
+        )
 
-        # creditor = Creditor(
-        #     name="Max Muster & Söhne",
-        #     street="Musterstrasse",
-        #     building_number="123",
-        #     postal_code="8000",
-        #     city="Seldwyla",
-        #     country="CH",
-        # )
-        #
-        # debtor = UltimateDebtor(
-        #     name="Simon Muster",
-        #     street="Musterstrasse",
-        #     building_number="1",
-        #     postal_code="8000",
-        #     city="Seldwyla",
-        #     country="CH",
-        # )
-        #
-        # qr_bill = QRBill(
-        #     account="CH4431999123000889012",
-        #     creditor=creditor,
-        #     amount=Decimal("1949.75"),
-        #     currency="CHF",
-        #     debtor=debtor,
-        #     reference_type="QRR",
-        #     reference="210000000003139471430009017",
-        #     additional_information="Order from 15.10.2020",
-        #     # billing_information="//S1/10/1234/11/201021/30/102673386/32/7.7/40/0:30",
-        #     # alternative_procedures=["eBill/B/simon.muster@example.com"]
-        # )
-        #
-        # result = qr_bill.build_data_string()
-        #
-        # fixture_path = FIXTURES_DIR / "example_2_with_billing_info.txt"
-        # expected = fixture_path.read_text()
-        #
-        # assert result == expected
+        debtor = UltimateDebtor(
+            name="Simon Muster",
+            street="Musterstrasse",
+            building_number="1",
+            postal_code="8000",
+            city="Seldwyla",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH4431999123000889012",
+            creditor=creditor,
+            amount=Decimal("1949.75"),
+            currency="CHF",
+            debtor=debtor,
+            reference_type="QRR",
+            reference="210000000003139471430009017",
+            additional_information="Order from 15.10.2020",
+            billing_information="//S1/10/1234/11/201021/30/102673386/32/7.7/40/0:30",
+            alternative_procedures=["eBill/B/simon.muster@example.com"],
+        )
+
+        result = qr_bill.build_data_string()
+
+        fixture_path = FIXTURES_DIR / "example_2_with_billing_info.txt"
+        expected = fixture_path.read_text().rstrip("\n")
+
+        assert result == expected
 
     def test_example_3_scor_reference(self):
         """Test example 3: Creditor Reference (ISO 11649)."""
