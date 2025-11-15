@@ -78,7 +78,7 @@
         <rect x="0mm" y="0mm" width="46mm" height="46mm" stroke="black" stroke-width="2px"
           fill="none" />
 
-        <!-- Swiss cross placeholder (7x7mm, centered) -->
+        <!-- Swiss cross (7x7mm, centered) -->
         <svg width="7mm" height="7mm" x="19.5mm" y="19.5mm" viewBox="0 0 36 36">
           <path d="m0 0h36v36h-36z" fill="#fff" />
           <path d="m2 2h32v32h-32z" fill="#000" />

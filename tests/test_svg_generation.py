@@ -325,6 +325,58 @@ class TestPaymentPartContent:
         assert qr_code_svg.get("width") == "46mm"
         assert qr_code_svg.get("height") == "46mm"
 
+    def test_swiss_cross_in_qr_code(self, basic_qr_bill):
+        """Test that Swiss cross is present in QR code with correct dimensions."""
+        svg_string = basic_qr_bill.generate_svg()
+        root = ET.fromstring(svg_string)
+
+        # Find the QR code section
+        payment = root.find(".//svg:svg[@class='payment']", SVG_NS)
+        qr_code_svg = payment.find(".//svg:svg[@id='qr_code_svg']", SVG_NS)
+
+        assert qr_code_svg is not None, "QR code section not found"
+
+        # Find the Swiss cross SVG within the QR code
+        # It should be a nested SVG with specific dimensions and position
+        swiss_cross = qr_code_svg.find("svg:svg", SVG_NS)
+
+        assert swiss_cross is not None, "Swiss cross not found in QR code"
+
+        # Verify Swiss cross dimensions and position
+        assert swiss_cross.get("width") == "7mm", "Swiss cross width should be 7mm"
+        assert swiss_cross.get("height") == "7mm", "Swiss cross height should be 7mm"
+        assert swiss_cross.get("x") == "19.5mm", (
+            "Swiss cross x position should be 19.5mm"
+        )
+        assert swiss_cross.get("y") == "19.5mm", (
+            "Swiss cross y position should be 19.5mm"
+        )
+        assert swiss_cross.get("viewBox") == "0 0 36 36", (
+            "Swiss cross viewBox should be 0 0 36 36"
+        )
+
+        # Verify the three paths that make up the Swiss cross
+        paths = swiss_cross.findall("svg:path", SVG_NS)
+        assert len(paths) == 3, f"Swiss cross should have 3 paths, found {len(paths)}"
+
+        # First path: white background (36x36)
+        assert paths[0].get("d") == "m0 0h36v36h-36z", (
+            "First path should be white background"
+        )
+        assert paths[0].get("fill") == "#fff", "First path should have white fill"
+
+        # Second path: black border (32x32)
+        assert paths[1].get("d") == "m2 2h32v32h-32z", (
+            "Second path should be black border"
+        )
+        assert paths[1].get("fill") == "#000", "Second path should have black fill"
+
+        # Third path: white cross shape
+        assert paths[2].get("d") == "m15 8h6v7h7v6h-7v7h-6v-7h-7v-6h7z", (
+            "Third path should be white cross"
+        )
+        assert paths[2].get("fill") == "#fff", "Third path should have white fill"
+
     def test_payment_part_has_creditor_info(self, basic_qr_bill):
         """Test payment part contains creditor information."""
         svg_string = basic_qr_bill.generate_svg()

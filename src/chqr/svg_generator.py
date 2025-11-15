@@ -391,19 +391,15 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
         '      <svg id="qr_code_svg" width="46mm" height="46mm" x="0mm" y="12mm">'
     )
     svg_parts.append(
-        '        <rect x="0mm" y="0mm" width="46mm" height="46mm" fill="black" />'
+        '        <rect x="0mm" y="0mm" width="46mm" height="46mm" fill="none" stroke="black" stroke-width="2px" />'
     )
     # Swiss cross
     svg_parts.append(
-        '        <rect x="19.5mm" y="19.5mm" width="7mm" height="7mm" fill="white" />'
+        '        <svg width="7mm" height="7mm" x="19.5mm" y="19.5mm" viewBox="0 0 36 36"><path d="m0 0h36v36h-36z" fill="#fff" /><path d="m2 2h32v32h-32z" fill="#000" /><path d="m15 8h6v7h7v6h-7v7h-6v-7h-7v-6h7z" fill="#fff" /></svg>'
     )
     svg_parts.append(
-        '        <rect x="21.5mm" y="19.5mm" width="3mm" height="7mm" fill="black" />'
+        "      </svg>",
     )
-    svg_parts.append(
-        '        <rect x="19.5mm" y="21.5mm" width="7mm" height="3mm" fill="black" />'
-    )
-    svg_parts.append("      </svg>")
 
     # Currency and Amount (bottom left)
     svg_parts.append(
