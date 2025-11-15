@@ -162,8 +162,6 @@ class TestQRCodeParameters:
 
     def test_qr_code_error_correction_level(self):
         """Test QR code uses error correction level M."""
-        import qrcode
-
         creditor = Creditor(
             name="Test",
             postal_code="8000",
@@ -181,7 +179,8 @@ class TestQRCodeParameters:
         qr_code = qr_bill.generate_qr_code()
 
         # Error correction level M (~15% redundancy)
-        assert qr_code.error_correction == qrcode.constants.ERROR_CORRECT_M
+        # segno uses 'M' as a string for error correction level
+        assert qr_code.error == "M", f"Expected error correction M, got {qr_code.error}"
 
     def test_qr_code_version_auto_select(self):
         """Test QR code version is auto-selected with max 25."""

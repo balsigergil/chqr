@@ -336,9 +336,15 @@ class TestPaymentPartContent:
 
         assert qr_code_svg is not None, "QR code section not found"
 
-        # Find the Swiss cross SVG within the QR code
-        # It should be a nested SVG with specific dimensions and position
-        swiss_cross = qr_code_svg.find("svg:svg", SVG_NS)
+        # Find all nested SVG elements in the QR code section
+        nested_svgs = qr_code_svg.findall("svg:svg", SVG_NS)
+
+        # Find the Swiss cross SVG (should have viewBox="0 0 36 36")
+        swiss_cross = None
+        for svg in nested_svgs:
+            if svg.get("viewBox") == "0 0 36 36":
+                swiss_cross = svg
+                break
 
         assert swiss_cross is not None, "Swiss cross not found in QR code"
 
