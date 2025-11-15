@@ -1,7 +1,7 @@
 """QR-bill generation for Swiss payment standards."""
 
 from decimal import Decimal
-import qrcode
+import segno
 from .creditor import Creditor
 from .debtor import UltimateDebtor
 from .svg_generator import generate_svg
@@ -147,7 +147,7 @@ class QRBill:
 
         return "\n".join(elements)
 
-    def generate_qr_code(self) -> qrcode.QRCode:
+    def generate_qr_code(self) -> segno.QRCode:
         """Generate a QR code for the Swiss QR-bill.
 
         Returns:
@@ -156,17 +156,12 @@ class QRBill:
             - Version auto-selected (max 25)
             - UTF-8 encoding
         """
-        qr = qrcode.QRCode(
-            version=None,  # Auto-select version
-            error_correction=qrcode.constants.ERROR_CORRECT_M,  # Required by spec
-            box_size=10,
-            border=4,
-        )
-
-        # Add the data string
         data = self.build_data_string()
-        qr.add_data(data)
-        qr.make(fit=True)  # Auto-select version, ensure it fits
+        qr = segno.make(
+            content=data,
+            version=None,  # Auto-select version
+            error="M",  # Error correction level M
+        )
 
         return qr
 

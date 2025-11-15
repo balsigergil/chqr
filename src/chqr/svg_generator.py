@@ -1,6 +1,7 @@
 """SVG generation for Swiss QR-bills."""
 
 from decimal import Decimal
+import io
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -386,14 +387,27 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
         f'      <text x="0mm" y="3mm" font-size="11pt" font-weight="bold">{escape_xml(t["payment_part"])}</text>'
     )
 
-    # QR Code section (placeholder for now)
+    # QR Code section with actual QR code
     svg_parts.append(
         '      <svg id="qr_code_svg" width="46mm" height="46mm" x="0mm" y="12mm">'
     )
-    svg_parts.append(
-        '        <rect x="0mm" y="0mm" width="46mm" height="46mm" fill="none" stroke="black" stroke-width="2px" />'
+    # Generate and insert the actual QR code
+    qr_code = qr_bill.generate_qr_code()
+    buffer = io.BytesIO()
+    qr_code.save(
+        buffer,
+        kind="svg",
+        xmldecl=False,
+        svgns=False,
+        svgclass=None,
+        lineclass=None,
+        omitsize=True,
+        border=0,
     )
-    # Swiss cross
+    qr_svg_content = buffer.getvalue().decode("utf-8")
+    svg_parts.append(f"        {qr_svg_content.strip()}")
+
+    # Swiss cross overlay (must be on top of QR code)
     svg_parts.append(
         '        <svg width="7mm" height="7mm" x="19.5mm" y="19.5mm" viewBox="0 0 36 36"><path d="m0 0h36v36h-36z" fill="#fff" /><path d="m2 2h32v32h-32z" fill="#000" /><path d="m15 8h6v7h7v6h-7v7h-6v-7h-7v-6h7z" fill="#fff" /></svg>'
     )
