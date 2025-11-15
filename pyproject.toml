@@ -1,7 +1,7 @@
 [project]
 name = "chqr"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "Swiss QR bill generation library for Python"
 readme = "README.md"
 authors = [
     { name = "Gil Balsiger", email = "gil.balsiger@gmail.com" }
@@ -18,9 +18,9 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pre-commit>=4.4.0",
-    "pytest>=9.0.0",
+    "pytest>=9.0.1",
     "pytest-cov>=7.0.0",
-    "ruff>=0.14.4",
+    "ruff>=0.14.5",
 ]
 
 [tool.ruff]
