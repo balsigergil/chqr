@@ -61,7 +61,7 @@ class TestSVGStructure:
 
         assert root.tag == "{http://www.w3.org/2000/svg}svg"
         assert root.get("width") == "210mm"
-        assert root.get("height") == "105mm"
+        assert root.get("height") == "108mm"
         assert "Arial" in root.get("font-family", "")
 
     def test_svg_has_receipt_and_payment_sections(self, basic_qr_bill):
@@ -85,7 +85,7 @@ class TestSVGStructure:
         assert receipt.get("width") == "62mm"
         assert receipt.get("height") == "105mm"
         assert receipt.get("x") == "0mm"
-        assert receipt.get("y") == "0mm"
+        assert receipt.get("y") == "3mm"  # Starts after separator line
 
     def test_payment_part_dimensions(self, basic_qr_bill):
         """Test payment part section has correct dimensions."""
@@ -96,25 +96,94 @@ class TestSVGStructure:
         assert payment.get("width") == "148mm"
         assert payment.get("height") == "105mm"
         assert payment.get("x") == "62mm"
-        assert payment.get("y") == "0mm"
+        assert payment.get("y") == "3mm"  # Starts after separator line
 
-    def test_separator_line(self, basic_qr_bill):
-        """Test that separator line between receipt and payment part exists."""
+    def test_separator_lines(self, basic_qr_bill):
+        """Test that all four separator lines exist."""
         svg_string = basic_qr_bill.generate_svg()
         root = ET.fromstring(svg_string)
 
-        # Find line element (direct child of root)
+        # Find all line elements (direct children of root)
         lines = root.findall("svg:line", SVG_NS)
-        separator_found = False
 
-        for line in lines:
-            if line.get("x1") == "62mm" and line.get("x2") == "62mm":
-                separator_found = True
-                assert line.get("y1") == "0mm"
-                assert line.get("y2") == "105mm"
-                break
+        # Should have 4 separator lines
+        assert len(lines) == 4, f"Expected 4 separator lines, found {len(lines)}"
 
-        assert separator_found, "Separator line not found"
+        # Check for horizontal top line (left part)
+        horizontal_left = [
+            l
+            for l in lines
+            if l.get("y1") == "3mm"
+            and l.get("y2") == "3mm"
+            and l.get("x1") == "0mm"
+            and l.get("x2") == "202.5mm"
+        ]
+        assert len(horizontal_left) == 1, "Horizontal left separator line not found"
+
+        # Check for horizontal top line (right part)
+        horizontal_right = [
+            l
+            for l in lines
+            if l.get("y1") == "3mm"
+            and l.get("y2") == "3mm"
+            and l.get("x1") == "204.8mm"
+            and l.get("x2") == "210mm"
+        ]
+        assert len(horizontal_right) == 1, "Horizontal right separator line not found"
+
+        # Check for vertical line (top part)
+        vertical_top = [
+            l
+            for l in lines
+            if l.get("x1") == "62mm"
+            and l.get("x2") == "62mm"
+            and l.get("y1") == "3mm"
+            and l.get("y2") == "102.5mm"
+        ]
+        assert len(vertical_top) == 1, "Vertical top separator line not found"
+
+        # Check for vertical line (bottom part)
+        vertical_bottom = [
+            l
+            for l in lines
+            if l.get("x1") == "62mm"
+            and l.get("x2") == "62mm"
+            and l.get("y1") == "104.8mm"
+            and l.get("y2") == "110mm"
+        ]
+        assert len(vertical_bottom) == 1, "Vertical bottom separator line not found"
+
+    def test_scissors_symbols(self, basic_qr_bill):
+        """Test that scissors symbols are present."""
+        svg_string = basic_qr_bill.generate_svg()
+        root = ET.fromstring(svg_string)
+
+        # Find all nested SVG elements (scissors are nested SVGs with viewBox)
+        all_svgs = root.findall(".//svg:svg", SVG_NS)
+
+        # Filter for scissors (have viewBox="0 0 12 12" and width/height of 3mm)
+        scissors = [
+            s
+            for s in all_svgs
+            if s.get("viewBox") == "0 0 12 12"
+            and s.get("width") == "3mm"
+            and s.get("height") == "3mm"
+        ]
+
+        # Should have 2 scissors symbols
+        assert len(scissors) == 2, f"Expected 2 scissors symbols, found {len(scissors)}"
+
+        # Check horizontal scissors position (top)
+        horizontal_scissors = [
+            s for s in scissors if s.get("x") == "202mm" and s.get("y") == "1.5mm"
+        ]
+        assert len(horizontal_scissors) == 1, "Horizontal scissors symbol not found"
+
+        # Check vertical scissors position (side)
+        vertical_scissors = [
+            s for s in scissors if s.get("x") == "60.5mm" and s.get("y") == "102mm"
+        ]
+        assert len(vertical_scissors) == 1, "Vertical scissors symbol not found"
 
 
 class TestReceiptContent:
@@ -386,7 +455,7 @@ class TestAmountFormatting:
         )
 
         qr_bill = QRBill(
-            account="CH4431999123000889012",
+            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
             creditor=creditor,
             amount=Decimal("50"),
             currency="CHF",
@@ -415,7 +484,7 @@ class TestConditionalElements:
         )
 
         qr_bill = QRBill(
-            account="CH4431999123000889012",
+            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
             creditor=creditor,
             currency="CHF",
         )
@@ -439,7 +508,7 @@ class TestConditionalElements:
         )
 
         qr_bill = QRBill(
-            account="CH4431999123000889012",
+            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
             creditor=creditor,
             amount=Decimal("100.00"),
             currency="CHF",
@@ -496,7 +565,7 @@ class TestLanguageSupport:
         )
 
         qr_bill = QRBill(
-            account="CH4431999123000889012",
+            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
             creditor=creditor,
             amount=Decimal("100.00"),
             currency="CHF",
@@ -523,7 +592,7 @@ class TestLanguageSupport:
         )
 
         qr_bill = QRBill(
-            account="CH4431999123000889012",
+            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
             creditor=creditor,
             amount=Decimal("100.00"),
             currency="CHF",
@@ -550,7 +619,7 @@ class TestLanguageSupport:
         )
 
         qr_bill = QRBill(
-            account="CH4431999123000889012",
+            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
             creditor=creditor,
             amount=Decimal("100.00"),
             currency="CHF",
@@ -577,7 +646,7 @@ class TestLanguageSupport:
         )
 
         qr_bill = QRBill(
-            account="CH4431999123000889012",
+            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
             creditor=creditor,
             amount=Decimal("100.00"),
             currency="CHF",

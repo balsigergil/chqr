@@ -4,6 +4,8 @@ from decimal import Decimal
 import qrcode
 from .creditor import Creditor
 from .debtor import UltimateDebtor
+from .svg_generator import generate_svg
+
 from .validators import (
     validate_iban,
     validate_reference_type,
@@ -167,3 +169,20 @@ class QRBill:
         qr.make(fit=True)  # Auto-select version, ensure it fits
 
         return qr
+
+    def generate_svg(self, language: str = "en") -> str:
+        """Generate SVG for the QR-bill.
+
+        Args:
+            language: Language code (en, de, fr, it). Defaults to "en".
+
+        Returns:
+            SVG string representing the complete QR-bill.
+
+        Example:
+            >>> qr_bill = QRBill(...)
+            >>> svg_string = qr_bill.generate_svg(language="de")
+            >>> with open("qr_bill.svg", "w") as f:
+            ...     f.write(svg_string)
+        """
+        return generate_svg(self, language)

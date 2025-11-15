@@ -24,6 +24,9 @@ dev = [
 ]
 
 [tool.ruff]
+ignore = [
+    "E741",  # ambiguous variable name
+]
 exclude = [
     "tests/fixtures/",
 ]
