@@ -510,3 +510,84 @@ class TestLanguageSupport:
         assert "Zahlteil" in all_text
         assert "Empfangsschein" in all_text
         assert "Konto / Zahlbar an" in all_text
+
+    def test_french_language(self):
+        """Test SVG generation with French language."""
+        creditor = Creditor(
+            name="Test",
+            street="Street",
+            building_number="1",
+            postal_code="8000",
+            city="City",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH4431999123000889012",
+            creditor=creditor,
+            amount=Decimal("100.00"),
+            currency="CHF",
+        )
+
+        svg_string = qr_bill.generate_svg(language="fr")
+        root = ET.fromstring(svg_string)
+
+        all_text = TestReceiptContent._get_all_text_content(root)
+
+        assert "Section paiement" in all_text
+        assert "Récépissé" in all_text
+        assert "Compte / Payable à" in all_text
+
+    def test_italian_language(self):
+        """Test SVG generation with Italian language."""
+        creditor = Creditor(
+            name="Test",
+            street="Street",
+            building_number="1",
+            postal_code="8000",
+            city="City",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH4431999123000889012",
+            creditor=creditor,
+            amount=Decimal("100.00"),
+            currency="CHF",
+        )
+
+        svg_string = qr_bill.generate_svg(language="it")
+        root = ET.fromstring(svg_string)
+
+        all_text = TestReceiptContent._get_all_text_content(root)
+
+        assert "Sezione pagamento" in all_text
+        assert "Ricevuta" in all_text
+        assert "Conto / Pagabile a" in all_text
+
+    def test_english_language(self):
+        """Test SVG generation with English language (default)."""
+        creditor = Creditor(
+            name="Test",
+            street="Street",
+            building_number="1",
+            postal_code="8000",
+            city="City",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH4431999123000889012",
+            creditor=creditor,
+            amount=Decimal("100.00"),
+            currency="CHF",
+        )
+
+        svg_string = qr_bill.generate_svg(language="en")
+        root = ET.fromstring(svg_string)
+
+        all_text = TestReceiptContent._get_all_text_content(root)
+
+        assert "Payment part" in all_text
+        assert "Receipt" in all_text
+        assert "Account / Payable to" in all_text
