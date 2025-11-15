@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="210mm" height="105mm" xmlns="http://www.w3.org/2000/svg"
+  font-family="Arial, Helvetica, Liberation Sans, sans-serif">
+  <!-- Background for visualization -->
+  <rect x="0mm" y="0mm" width="210mm" height="105mm" fill="white" />
+
+  <!-- Separator line between receipt and payment part -->
+  <line x1="62mm" y1="0mm" x2="62mm" y2="105mm" stroke="black" stroke-width="0.1mm"
+    stroke-dasharray="1,1" />
+
+  <!-- ============================================ -->
+  <!-- RECEIPT SECTION (0-62mm width, 0-105mm height) -->
+  <!-- ============================================ -->
+  <svg class="receipt" x="0mm" y="0mm" width="62mm" height="105mm">
+    <svg class="innerReceipt" x="5mm" y="5mm" width="52mm" height="95mm">
+
+      <!-- Title Section -->
+      <text x="0mm" y="3mm" font-size="11pt" font-weight="bold">Receipt</text>
+
+      <!-- Information Section -->
+      <text x="0mm" y="3.65mm">
+        <tspan x="0mm" dy="18pt" font-size="6pt" font-weight="bold">Account / Payable to</tspan>
+        <tspan x="0mm" dy="9pt" font-size="8pt">CH44 3199 9123 0008 8901 2</tspan>
+        <tspan x="0mm" dy="9pt" font-size="8pt">Max Muster &amp; Söhne</tspan>
+        <tspan x="0mm" dy="9pt" font-size="8pt">Musterstrasse 123</tspan>
+        <tspan x="0mm" dy="9pt" font-size="8pt">8000 Seldwyla</tspan>
+
+        <tspan x="0mm" dy="18pt" font-size="6pt" font-weight="bold">Reference</tspan>
+        <tspan x="0mm" dy="9pt" font-size="8pt">21 00000 00003 13947 14300 09017</tspan>
+
+        <tspan x="0mm" dy="18pt" font-size="6pt" font-weight="bold">Payable by</tspan>
+        <tspan x="0mm" dy="9pt" font-size="8pt">Simon Muster</tspan>
+        <tspan x="0mm" dy="9pt" font-size="8pt">Musterstrasse 1</tspan>
+        <tspan x="0mm" dy="9pt" font-size="8pt">8000 Seldwyla</tspan>
+      </text>
+
+      <!-- Amount Section -->
+      <text x="0mm" y="66mm" font-size="6pt" font-weight="bold">Currency</text>
+      <text x="0mm" y="70mm" font-size="8pt">CHF</text>
+      <text x="22mm" y="66mm" font-size="6pt" font-weight="bold">Amount</text>
+      <text x="22mm" y="70mm" font-size="8pt">1 949.75</text>
+
+      <!-- Acceptance Point Section (right-aligned at bottom) -->
+      <text x="52mm" y="80mm" text-anchor="end" font-size="6pt" font-weight="bold">Acceptance point</text>
+    </svg>
+  </svg>
+
+  <!-- ============================================ -->
+  <!-- PAYMENT PART SECTION (62-210mm width, 0-105mm height) -->
+  <!-- ============================================ -->
+  <svg class="payment" x="62mm" y="0mm" width="148mm" height="105mm">
+    <svg class="innerPayment" x="5mm" y="5mm" width="138mm" height="95mm">
+
+      <!-- Title Section -->
+      <text x="0mm" y="3mm" font-size="11pt" font-weight="bold">Payment part</text>
+
+      <!-- Swiss QR Code Section (simple square placeholder) -->
+      <svg id="qr_code_svg" width="46mm" height="46mm" x="0mm" y="12mm">
+        <!-- QR Code border -->
+        <rect x="0mm" y="0mm" width="46mm" height="46mm" fill="black" />
+
+        <!-- Swiss cross placeholder (7x7mm, centered) -->
+        <rect x="19.5mm" y="19.5mm" width="7mm" height="7mm" fill="white" />
+        <rect x="21.5mm" y="19.5mm" width="3mm" height="7mm" fill="black" />
+        <rect x="19.5mm" y="21.5mm" width="7mm" height="3mm" fill="black" />
+      </svg>
+
+      <!-- Currency and Amount (bottom left) -->
+      <text x="0mm" y="66mm" font-size="8pt" font-weight="bold">Currency</text>
+      <text x="0mm" y="70mm" font-size="10pt">CHF</text>
+      <text x="22mm" y="66mm" font-size="8pt" font-weight="bold">Amount</text>
+      <text x="22mm" y="70mm" font-size="10pt">1 949.75</text>
+
+      <!-- Information Section (right side using tspan for vertical layout) -->
+      <text x="51mm" y="-4.76mm">
+        <tspan x="51mm" dy="22pt" font-size="8pt" font-weight="bold">Account / Payable to</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">CH44 3199 9123 0008 8901 2</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">Max Muster &amp; Söhne</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">Musterstrasse 123</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">8000 Seldwyla</tspan>
+
+        <tspan x="51mm" dy="22pt" font-size="8pt" font-weight="bold">Reference</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">21 00000 00003 13947 14300 09017</tspan>
+
+        <tspan x="51mm" dy="22pt" font-size="8pt" font-weight="bold">Additional information</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">Auftrag vom 15.06.2020</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">//S1/10/10201409/11/170309/20/14000000/</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">30/106017086</tspan>
+
+        <tspan x="51mm" dy="22pt" font-size="8pt" font-weight="bold">Payable by</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">Simon Muster</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">Musterstrasse 1</tspan>
+        <tspan x="51mm" dy="11pt" font-size="10pt">8000 Seldwyla</tspan>
+      </text>
+
+      <!-- Further Information Section (bottom) -->
+      <text x="0mm" y="85mm" font-size="7pt" font-weight="bold">Name AV1: <tspan
+          font-weight="normal">UV;UltraPay005;12345</tspan></text>
+      <text x="0mm" y="90mm" font-size="7pt" font-weight="bold">Name AV2: <tspan
+          font-weight="normal">XY;XYService;54321</tspan></text>
+    </svg>
+  </svg>
+
+  <!-- Guides for margins (optional, can be removed) -->
+  <g id="guides" stroke="red" stroke-width="1px" fill="none" opacity="1">
+    <!-- 5mm margins -->
+    <rect x="5mm" y="5mm" width="52mm" height="95mm" />
+    <rect x="67mm" y="5mm" width="138mm" height="95mm" />
+  </g>
+</svg>
