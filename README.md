@@ -10,7 +10,7 @@
 </div>
 
 <div align="center">
-<img src="assets/qr_bill_example.png" alt="Example Swiss QR-bill generated with chqr"/>
+<img src="https://raw.githubusercontent.com/balsigergil/chqr/refs/heads/main/assets/qr_bill_example.png" alt="Example Swiss QR-bill generated with chqr"/>
 </div>
 
 ## Overview
