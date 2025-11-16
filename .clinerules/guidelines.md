@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**chqr** is a Python library for generating Swiss QR-bills in multiple formats (SVG, PDF, HTML).
+**chqr** is a Python library for generating Swiss QR-bills in multiple formats (SVG, PDF, PNG).
 
 ## Development Practices
 
@@ -18,17 +18,18 @@
 ```
 src/chqr/          # Main package code
 tests/             # Test files (mirror src/ structure)
-docs/              # Documentation and specifications
+docs/              # Technical documentation
+assets/            # QR-bill specifications and resources
 ```
 
 ### Key References
 
-- **Technical Spec**: `docs/qr_bill_spec.md` - Complete Swiss QR-bill specification
-- **PDF Source**: `docs/ig-qr-bill-v2.3-en.pdf` - Official implementation guidelines
+- **Technical Spec**: `assets/qr_bill_spec.md` - Complete Swiss QR-bill specification
+- **PDF Source**: `assets/ig-qr-bill-v2.3-en.pdf` - Official implementation guidelines
 
 ## Output Formats
 
-The library must support: SVG, PDF and HTML
+The library should support: SVG, PDF and PNG
 
 ## Validation Requirements
 
@@ -61,27 +62,17 @@ def test_feature_description():
     assert result.is_valid()
 ```
 
-### Test Categories
-
-- **Unit tests**: Individual components and validators
-- **Integration tests**: Complete QR-bill generation
-- **Validation tests**: Compliance with Swiss specification
-- **Format tests**: SVG, PDF, HTML output validation
-
 ### Running Tests
 
 ```bash
 # All tests
-pytest
+uv run pytest
 
 # Specific test file
-pytest tests/test_qr_bill.py
+uv run pytest tests/test_qr_bill.py
 
 # With coverage
-pytest --cov=chqr
-
-# Verbose output
-pytest -v
+uv run pytest --cov=chqr
 ```
 
 ## Code Quality

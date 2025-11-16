@@ -9,7 +9,9 @@
 
 </div>
 
----
+<div align="center">
+<img src="assets/qr_bill_example.png" alt="Example Swiss QR-bill generated with chqr"/>
+</div>
 
 ## Overview
 
@@ -222,28 +224,6 @@ svg_it = bill.generate_svg(language="it")
 svg_en = bill.generate_svg(language="en")
 ```
 
-### Donations and Open Amount
-
-> [!NOTE]
-> Work in progress.
-
-<!-- For donation slips or when the amount should be filled in by the payer, simply omit the amount:
-
-```python
-bill = QRBill(
-    account="CH5204835012345671000",
-    creditor=Creditor(
-        name="Charity Foundation",
-        street="P.O. Box",
-        postal_code="3001",
-        city="Bern",
-        country="CH",
-    ),
-    currency="CHF",
-    reference_type="NON",
-)
-``` -->
-
 ## API Reference
 
 ### QRBill
@@ -367,6 +347,24 @@ No structured reference is used. This **must** be used with regular IBANs (not Q
 **When to use:** No specific payment reference is needed, such as for donations or simple payments where additional information is sufficient.
 
 **Format:** The reference field remains empty, but you can use `additional_information` for unstructured messages.
+
+## Work in Progress
+
+The following features are currently under development and will be available in future releases:
+
+### Additional Output Formats
+
+While SVG generation is fully supported, we're working on adding more output formats to make the library even more versatile:
+
+- **PDF Generation**: Direct PDF output for seamless integration into invoicing systems and document workflows
+- **PNG Export**: Raster image export for use in contexts where vector graphics aren't supported
+
+These formats will follow the same API pattern as `generate_svg()`, making it easy to switch between output types based on your needs.
+
+### Optional Bill Variants
+
+- Bill without a specified amount, allowing payers to enter their own amount
+- Bill without a specified debtor, suitable for donation scenarios
 
 ## Development
 
