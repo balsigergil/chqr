@@ -187,6 +187,39 @@ def escape_xml(text: str) -> str:
     )
 
 
+def generate_placeholder_box(
+    width: str, height: str, x: str = "0mm", y: str = "0mm"
+) -> str:
+    """Generate SVG for a placeholder box with corner markers.
+
+    Creates a rectangular frame with L-shaped corner markers, used to indicate
+    where debtor information can be manually written when not provided.
+
+    Args:
+        width: Box width (e.g., "52.6mm")
+        height: Box height (e.g., "20.6mm")
+        x: X position offset (default: "0mm")
+        y: Y position offset (default: "0mm")
+
+    Returns:
+        SVG string for the placeholder box with corner markers
+    """
+    return f'''      <svg x="{x}" y="{y}" width="{width}" height="{height}">
+        <svg x="0.3mm" y="0.3mm" width="3mm" height="3mm" viewBox="0 0 12 12">
+          <path d="m0 0h12v1H1v11H0z" />
+        </svg>
+        <svg x="calc({width} - 3mm - 0.3mm)" y="0.3mm" width="3mm" height="3mm" viewBox="0 0 12 12">
+          <path d="m0 0h12v12H11V1H0z" />
+        </svg>
+        <svg x="0.3mm" y="calc({height} - 3mm - 0.3mm)" width="3mm" height="3mm" viewBox="0 0 12 12">
+          <path d="m0 0h1v11h11v1H0z" />
+        </svg>
+        <svg x="calc({width} - 3mm - 0.3mm)" y="calc({height} - 3mm - 0.3mm)" width="3mm" height="3mm" viewBox="0 0 12 12">
+          <path d="m11 0h1v12H0V11h11z" />
+        </svg>
+      </svg>'''
+
+
 def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
     """Generate SVG for QR-bill.
 
@@ -323,10 +356,13 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
             f'        <tspan x="0mm" dy="9pt" font-size="8pt">{escape_xml(formatted_reference)}</tspan>'
         )
 
-    # Payable by
+    svg_parts.append("      </text>")
+
+    # Payable by section
     if qr_bill.debtor:
+        svg_parts.append('      <text x="0mm" y="42mm">')
         svg_parts.append(
-            f'        <tspan x="0mm" dy="18pt" font-size="6pt" font-weight="bold">{escape_xml(t["payable_by"])}</tspan>'
+            f'        <tspan x="0mm" dy="0pt" font-size="6pt" font-weight="bold">{escape_xml(t["payable_by"])}</tspan>'
         )
         svg_parts.append(
             f'        <tspan x="0mm" dy="9pt" font-size="8pt">{escape_xml(qr_bill.debtor.name)}</tspan>'
@@ -345,12 +381,15 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
             svg_parts.append(
                 f'        <tspan x="0mm" dy="9pt" font-size="8pt">{escape_xml(debtor_city_line)}</tspan>'
             )
+        svg_parts.append("      </text>")
     else:
+        # Render "Payable by (name/address)" label and placeholder box
         svg_parts.append(
-            f'        <tspan x="0mm" dy="18pt" font-size="6pt" font-weight="bold">{escape_xml(t["payable_by_name_address"])}</tspan>'
+            f'      <text x="0mm" y="42mm" font-size="6pt" font-weight="bold">{escape_xml(t["payable_by_name_address"])}</text>'
         )
-
-    svg_parts.append("      </text>")
+        svg_parts.append(
+            generate_placeholder_box("52.6mm", "20.6mm", "-0.3mm", "42.7mm")
+        )
 
     # Amount section
     svg_parts.append(
@@ -478,10 +517,13 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
             f'        <tspan x="51mm" dy="11pt" font-size="10pt">{escape_xml(qr_bill.additional_information)}</tspan>'
         )
 
-    # Payable by
+    svg_parts.append("      </text>")
+
+    # Payable by section
     if qr_bill.debtor:
+        svg_parts.append('      <text x="51mm" y="59mm">')
         svg_parts.append(
-            f'        <tspan x="51mm" dy="22pt" font-size="8pt" font-weight="bold">{escape_xml(t["payable_by"])}</tspan>'
+            f'        <tspan x="51mm" dy="0pt" font-size="8pt" font-weight="bold">{escape_xml(t["payable_by"])}</tspan>'
         )
         svg_parts.append(
             f'        <tspan x="51mm" dy="11pt" font-size="10pt">{escape_xml(qr_bill.debtor.name)}</tspan>'
@@ -500,12 +542,15 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
             svg_parts.append(
                 f'        <tspan x="51mm" dy="11pt" font-size="10pt">{escape_xml(debtor_city_full)}</tspan>'
             )
+        svg_parts.append("      </text>")
     else:
+        # Render "Payable by (name/address)" label and placeholder box
         svg_parts.append(
-            f'        <tspan x="51mm" dy="22pt" font-size="8pt" font-weight="bold">{escape_xml(t["payable_by_name_address"])}</tspan>'
+            f'      <text x="51mm" y="59mm" font-size="8pt" font-weight="bold">{escape_xml(t["payable_by_name_address"])}</text>'
         )
-
-    svg_parts.append("      </text>")
+        svg_parts.append(
+            generate_placeholder_box("65.6mm", "25.6mm", "50.7mm", "59.7mm")
+        )
 
     svg_parts.append("    </svg>")
     svg_parts.append("  </svg>")
