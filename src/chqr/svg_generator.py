@@ -406,6 +406,11 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
         svg_parts.append(
             f'      <text x="22mm" y="70mm" font-size="8pt">{escape_xml(formatted_amount)}</text>'
         )
+    else:
+        # Render placeholder box for amount (donation scenario)
+        svg_parts.append(
+            generate_placeholder_box("30.6mm", "10.6mm", "21.7mm", "66.7mm")
+        )
 
     # Acceptance point
     svg_parts.append(
@@ -468,6 +473,11 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
     if formatted_amount:
         svg_parts.append(
             f'      <text x="22mm" y="70mm" font-size="10pt">{escape_xml(formatted_amount)}</text>'
+        )
+    else:
+        # Render placeholder box for amount (donation scenario)
+        svg_parts.append(
+            generate_placeholder_box("40.6mm", "15.6mm", "9.7mm", "66.7mm")
         )
 
     # Information section (right side)
