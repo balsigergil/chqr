@@ -21,7 +21,7 @@ The Swiss QR-bill is the standardized payment slip used throughout Switzerland a
 
 ### Key Features
 
-- **Full compliance** with Swiss QR-bill specification v2.3
+- **Full compliance** with Swiss QR-bill specification v2.3 (November 2025)
 - **Complete validation** of all input data (IBANs, references, amounts, addresses)
 - **SVG generation** with multilingual support (English, German, French, Italian)
 - **Support for all reference types**: QRR (QR Reference), SCOR (Creditor Reference), and NON (no reference)
@@ -36,10 +36,10 @@ Install chqr from PyPI using pip:
 pip install chqr
 ```
 
-Or using uv for faster installation:
+Or using uv:
 
 ```bash
-uv pip install chqr
+uv add chqr
 ```
 
 ## Quick Start
@@ -360,11 +360,6 @@ While SVG generation is fully supported, we're working on adding more output for
 - **PNG Export**: Raster image export for use in contexts where vector graphics aren't supported
 
 These formats will follow the same API pattern as `generate_svg()`, making it easy to switch between output types based on your needs.
-
-### Optional Bill Variants
-
-- Bill without a specified amount, allowing payers to enter their own amount
-- Bill without a specified debtor, suitable for donation scenarios
 
 ## Development
 
