@@ -68,7 +68,7 @@ class QRBill:
         validate_currency(currency)
         validate_amount(amount, currency)
 
-        self.account = account
+        self.account = account.replace(" ", "")
         self.creditor = creditor
         self.currency = currency
         self.amount = amount

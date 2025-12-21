@@ -73,9 +73,6 @@ def format_iban(iban: str) -> str:
     Example:
         CH4431999123000889012 -> CH44 3199 9123 0008 8901 2
     """
-    # Remove any existing spaces
-    iban = iban.replace(" ", "")
-
     # Group in 4s
     groups = []
     for i in range(0, len(iban), 4):
