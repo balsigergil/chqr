@@ -1,6 +1,6 @@
 [project]
 name = "chqr"
-version = "1.0.1"
+version = "1.1.0"
 description = "Swiss QR bill generation library for Python"
 readme = "README.md"
 license = "ISC"
