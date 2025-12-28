@@ -266,14 +266,24 @@ class TestAmountValidation:
         )
         assert qr_bill.amount == Decimal("0.01")
 
-        # Valid: zero for notification-only QR-bills
+        # Valid: zero for notification-only QR-bills (must have notification text)
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("0.00"),
+            currency="CHF",
+            additional_information="DO NOT USE FOR PAYMENT",
+        )
+        assert qr_bill.amount == Decimal("0.00")
+
+        # Valid: zero amount without notification text (will auto-fill)
         qr_bill = QRBill(
             account="CH5800791123000889012",
             creditor=creditor,
             amount=Decimal("0.00"),
             currency="CHF",
         )
-        assert qr_bill.amount == Decimal("0.00")
+        assert qr_bill.additional_information == "DO NOT USE FOR PAYMENT"
 
         # Invalid: negative amounts
         with pytest.raises(ValidationError, match="negative"):

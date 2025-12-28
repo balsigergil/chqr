@@ -5,6 +5,7 @@ import segno
 from .creditor import Creditor
 from .debtor import UltimateDebtor
 from .svg_generator import generate_svg
+from .exceptions import ValidationError
 
 from .validators import (
     validate_iban,
@@ -67,6 +68,34 @@ class QRBill:
         # Validate currency and amount
         validate_currency(currency)
         validate_amount(amount, currency)
+
+        # Implement Notification Mode ("DO NOT USE FOR PAYMENT") rules
+        # See section 8.4 of Technical Specification
+        ALLOWED_NOTIFICATION_TEXTS = {
+            "NICHT ZUR ZAHLUNG VERWENDEN",
+            "NE PAS UTILISER POUR LE PAIEMENT",
+            "NON UTILIZZARE PER IL PAGAMENTO",
+            "DO NOT USE FOR PAYMENT",
+        }
+
+        # Rule: If amount is 0.00, notification text must be one of the allowed strings
+        # If not (or if invalid text provided), auto-set to default (English)
+        if amount is not None and amount == Decimal("0.00"):
+            if (
+                not additional_information
+                or additional_information not in ALLOWED_NOTIFICATION_TEXTS
+            ):
+                additional_information = "DO NOT USE FOR PAYMENT"
+
+        # Rule: If notification text is one of the allowed strings, amount must be 0.00
+        if (
+            additional_information
+            and additional_information in ALLOWED_NOTIFICATION_TEXTS
+        ):
+            if amount is None or amount != Decimal("0.00"):
+                raise ValidationError(
+                    f"For notification text '{additional_information}', amount must be 0.00"
+                )
 
         self.account = account.replace(" ", "")
         self.creditor = creditor
