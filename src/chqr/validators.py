@@ -115,6 +115,10 @@ def validate_reference_type(account: str, reference_type: str) -> None:
             raise ValidationError(
                 "Regular IBAN cannot use QRR reference type. Use SCOR or NON instead"
             )
+        if reference_type not in ("SCOR", "NON"):
+            raise ValidationError(
+                f"Reference type must be SCOR or NON for regular IBAN, got {reference_type}"
+            )
 
 
 def _calculate_mod10_recursive_check_digit(reference: str) -> int:
