@@ -232,7 +232,9 @@ def generate_svg(qr_bill: "QRBill", language: str = "en") -> str:
 
     # Format data
     formatted_iban = format_iban(qr_bill.account)
-    formatted_amount = format_amount(qr_bill.amount) if qr_bill.amount else None
+    formatted_amount = (
+        format_amount(qr_bill.amount) if qr_bill.amount is not None else None
+    )
 
     # Format reference based on type
     formatted_reference = None
