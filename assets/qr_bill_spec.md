@@ -252,6 +252,31 @@ Example: //S1/10/10201409/11/190512/20/1400.000-53/30/106017086/32/7.7/40/2:10;0
 - **Example**: `eBill/B/simon.muster@example.com`
 - **Purpose**: Enable conversion to other payment methods
 
+### 8.4 Notification Mode (DO NOT USE FOR PAYMENT)
+
+This mode is used to notify the invoice recipient without requesting payment (e.g., eBill enrollment).
+
+**Requirements:**
+
+- **Amount**: Must be exactly `0.00`
+- **Additional Information (Ustrd)**: Must contain the specific text in capital letters corresponding to the language.
+
+**Language Table:**
+
+| Language | Amount | Additional Information (Ustrd)   |
+| :------- | :----- | :------------------------------- |
+| German   | 0.00   | NICHT ZUR ZAHLUNG VERWENDEN      |
+| French   | 0.00   | NE PAS UTILISER POUR LE PAIEMENT |
+| Italian  | 0.00   | NON UTILIZZARE PER IL PAGAMENTO  |
+| English  | 0.00   | DO NOT USE FOR PAYMENT           |
+
+**Rules:**
+
+1. Text must be in **ALL CAPS**.
+2. Amount field must not be empty (must be `0.00`).
+3. Amount is purely numeric (no letters/special characters).
+4. This specifically enables conversion to a notification (e.g. for eBill) that must not be released for payment.
+
 ## 9. Layout Requirements
 
 ### 9.1 Paper Specifications
