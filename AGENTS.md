@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**chqr** is a Python library for generating Swiss QR-bills in multiple formats (SVG, PDF, PNG).
+**chqr** is a Python library for generating Swiss QR-bills in SVG format.
 
 ## Development Practices
 
@@ -29,7 +29,7 @@ assets/            # QR-bill specifications and resources
 
 ## Output Formats
 
-The library should support: SVG, PDF and PNG
+The library should support: SVG
 
 ## Validation Requirements
 
