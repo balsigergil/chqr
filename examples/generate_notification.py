@@ -36,7 +36,7 @@ def main():
     )
 
     output_filename = "notification_example.svg"
-    svg = bill.generate_svg("en")
+    svg = bill.generate_svg("fr")
 
     with open(output_filename, "w", encoding="utf-8") as f:
         f.write(svg)
