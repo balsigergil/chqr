@@ -210,7 +210,7 @@ class TestQRDataStructure:
             amount=Decimal("999999999.99"),
             currency="CHF",
             reference_type="SCOR",
-            reference="RF18" + "X" * 21,  # Max length
+            reference="RF78" + "X" * 21,  # Max length (check digits validated)
             additional_information="Y" * 140,  # Max length
         )
 

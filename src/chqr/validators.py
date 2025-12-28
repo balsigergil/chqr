@@ -137,6 +137,31 @@ def _calculate_mod10_recursive_check_digit(reference: str) -> int:
     return (10 - carry) % 10
 
 
+def _validate_creditor_reference_checksum(reference: str) -> bool:
+    """Validate Creditor Reference checksum using modulo 97-10 algorithm (ISO 11649).
+
+    Args:
+        reference: The Creditor Reference to validate (e.g., "RF48...")
+
+    Returns:
+        True if checksum is valid, False otherwise
+    """
+    # Move first 4 characters (RF + 2 check digits) to the end
+    rearranged = reference[4:] + reference[:4]
+
+    # Replace letters with numbers (A=10, B=11, ..., Z=35)
+    numeric_string = ""
+    for char in rearranged.upper():
+        if char.isdigit():
+            numeric_string += char
+        else:
+            # Convert letter to number (A=10, B=11, etc.)
+            numeric_string += str(ord(char) - ord("A") + 10)
+
+    # Calculate MOD97 - result should be 1 for valid reference
+    return int(numeric_string) % 97 == 1
+
+
 def validate_creditor_reference(reference: str) -> None:
     """Validate Creditor Reference (ISO 11649) format.
 
@@ -162,6 +187,12 @@ def validate_creditor_reference(reference: str) -> None:
     # Must be alphanumeric
     if not reference.isalnum():
         raise ValidationError("Creditor Reference must be alphanumeric")
+
+    # Validate check digits using modulo 97-10 algorithm
+    if not _validate_creditor_reference_checksum(reference):
+        raise ValidationError(
+            "Creditor Reference check digits are invalid (modulo 97-10 verification failed)"
+        )
 
 
 def validate_qr_reference(reference: str) -> None:

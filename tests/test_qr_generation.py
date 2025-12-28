@@ -121,7 +121,7 @@ class TestQRDataString:
             currency="CHF",
             debtor=debtor,
             reference_type="SCOR",
-            reference="RF720191230100405JSH0438",
+            reference="RF240191230100405JSH0438",  # Corrected check digits (24, not 72)
         )
 
         result = qr_bill.build_data_string()

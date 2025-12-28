@@ -217,6 +217,72 @@ class TestReferenceValidation:
                 reference="RF12",
             )
 
+        # Invalid: too long (max 25 chars)
+        with pytest.raises(ValidationError, match="5.*25"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                currency="CHF",
+                reference_type="SCOR",
+                reference="RF12345678901234567890123456",  # 26 chars
+            )
+
+    def test_creditor_reference_check_digit(self):
+        """Test Creditor Reference check digit validation using modulo 97-10."""
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid SCOR reference (corrected from spec example - should be RF24, not RF72)
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+            reference_type="SCOR",
+            reference="RF240191230100405JSH0438",  # Valid check digits: 24
+        )
+        assert qr_bill.reference == "RF240191230100405JSH0438"
+
+        # Invalid: wrong check digits (should be 24, not 72)
+        with pytest.raises(ValidationError, match="check digit"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                currency="CHF",
+                reference_type="SCOR",
+                reference="RF720191230100405JSH0438",  # Wrong check digits
+            )
+
+        # Another valid reference
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+            reference_type="SCOR",
+            reference="RF18539007547034",  # Valid check digits: 18
+        )
+        assert qr_bill.reference == "RF18539007547034"
+
+        # Invalid: wrong check digits (should be 18, not 19)
+        with pytest.raises(ValidationError, match="check digit"):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                currency="CHF",
+                reference_type="SCOR",
+                reference="RF19539007547034",  # Wrong check digits
+            )
+
+        # Test with minimal valid reference (RF + 2 digits + 1 char minimum)
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+            reference_type="SCOR",
+            reference="RF25A",  # Valid minimal reference
+        )
+        assert qr_bill.reference == "RF25A"
+
 
 class TestAmountValidation:
     """Test amount format and range validation."""
