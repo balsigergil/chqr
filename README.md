@@ -224,6 +224,20 @@ svg_it = bill.generate_svg(language="it")
 svg_en = bill.generate_svg(language="en")
 ```
 
+#### Notification Payment
+
+You can generate QR-bills with a zero amount for notification purposes (e.g., eBill enrollment). This automatically adds the required "DO NOT USE FOR PAYMENT" text (or its translation) to the bill.
+
+```python
+bill = QRBill(
+    account="CH5800791123000889012",
+    creditor=creditor,
+    amount=Decimal("0.00"),  # Triggers notification mode
+    currency="CHF",
+    # "DO NOT USE FOR PAYMENT" is automatically added to additional_information
+)
+```
+
 ## API Reference
 
 ### QRBill
@@ -250,7 +264,7 @@ QRBill(
 - **account** (str): IBAN or QR-IBAN, exactly 21 characters. Must be from Switzerland (CH) or Liechtenstein (LI).
 - **creditor** (Creditor): Creditor information (who receives the payment).
 - **currency** (str): Payment currency, either `"CHF"` or `"EUR"`.
-- **amount** (Decimal | None): Payment amount with exactly 2 decimal places. Range: 0.01 to 999,999,999.99. Can be `None` for open amounts.
+- **amount** (Decimal | None): Payment amount with exactly 2 decimal places. Range: 0.01 to 999,999,999.99 (or `0.00` for notification). Can be `None` for open amounts.
 - **reference_type** (str): Reference type - `"QRR"`, `"SCOR"`, or `"NON"`. Default: `"NON"`.
 - **reference** (str | None): Payment reference. Required for QRR and SCOR types.
 - **additional_information** (str | None): Unstructured message, max 140 characters.
@@ -347,19 +361,6 @@ No structured reference is used. This **must** be used with regular IBANs (not Q
 **When to use:** No specific payment reference is needed, such as for donations or simple payments where additional information is sufficient.
 
 **Format:** The reference field remains empty, but you can use `additional_information` for unstructured messages.
-
-## Work in Progress
-
-The following features are currently under development and will be available in future releases:
-
-### Additional Output Formats
-
-While SVG generation is fully supported, we're working on adding more output formats to make the library even more versatile:
-
-- **PDF Generation**: Direct PDF output for seamless integration into invoicing systems and document workflows
-- **PNG Export**: Raster image export for use in contexts where vector graphics aren't supported
-
-These formats will follow the same API pattern as `generate_svg()`, making it easy to switch between output types based on your needs.
 
 ## Development
 
