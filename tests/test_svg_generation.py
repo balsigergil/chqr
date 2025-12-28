@@ -139,7 +139,7 @@ class TestSVGStructure:
             if l.get("x1") == "62mm"
             and l.get("x2") == "62mm"
             and l.get("y1") == "3mm"
-            and l.get("y2") == "102.5mm"
+            and l.get("y2") == "100.5mm"
         ]
         assert len(vertical_top) == 1, "Vertical top separator line not found"
 
@@ -149,8 +149,8 @@ class TestSVGStructure:
             for l in lines
             if l.get("x1") == "62mm"
             and l.get("x2") == "62mm"
-            and l.get("y1") == "104.8mm"
-            and l.get("y2") == "110mm"
+            and l.get("y1") == "102.8mm"
+            and l.get("y2") == "108mm"
         ]
         assert len(vertical_bottom) == 1, "Vertical bottom separator line not found"
 
@@ -182,7 +182,7 @@ class TestSVGStructure:
 
         # Check vertical scissors position (side)
         vertical_scissors = [
-            s for s in scissors if s.get("x") == "60.5mm" and s.get("y") == "102mm"
+            s for s in scissors if s.get("x") == "60.5mm" and s.get("y") == "100mm"
         ]
         assert len(vertical_scissors) == 1, "Vertical scissors symbol not found"
 
