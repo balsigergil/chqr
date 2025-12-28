@@ -5,6 +5,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 import pytest
 from chqr import QRBill, Creditor, UltimateDebtor
+from chqr.constants import TRANSLATIONS, ALLOWED_NOTIFICATION_TEXTS
 
 
 # SVG namespace
@@ -609,112 +610,290 @@ class TestConditionalElements:
 
 
 class TestLanguageSupport:
-    """Test multi-language support for headings."""
+    """Test multi-language support for all translations."""
 
-    def test_german_language(self):
-        """Test SVG generation with German language."""
+    @pytest.mark.parametrize("language", ["en", "de", "fr", "it"])
+    def test_all_translations_with_full_qr_bill(self, language):
+        """Test all translations with a complete QR-bill (debtor, reference, amount, additional_info)."""
         creditor = Creditor(
-            name="Test",
-            street="Street",
+            name="Test Company",
+            street="Main Street",
             building_number="1",
             postal_code="8000",
-            city="City",
+            city="Zurich",
+            country="CH",
+        )
+
+        debtor = UltimateDebtor(
+            name="John Doe",
+            street="Test Street",
+            building_number="42",
+            postal_code="8001",
+            city="Zurich",
             country="CH",
         )
 
         qr_bill = QRBill(
-            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
+            account="CH4431999123000889012",
             creditor=creditor,
-            amount=Decimal("100.00"),
+            amount=Decimal("1234.56"),
             currency="CHF",
+            reference_type="QRR",
+            reference="210000000003139471430009017",
+            additional_information="Payment for invoice #12345",
+            debtor=debtor,
         )
 
-        svg_string = qr_bill.generate_svg(language="de")
+        svg_string = qr_bill.generate_svg(language=language)
         root = ET.fromstring(svg_string)
-
         all_text = TestReceiptContent._get_all_text_content(root)
 
-        assert "Zahlteil" in all_text
-        assert "Empfangsschein" in all_text
-        assert "Konto / Zahlbar an" in all_text
+        # Get translations from constants
+        translations = TRANSLATIONS[language]
 
-    def test_french_language(self):
-        """Test SVG generation with French language."""
+        # These should all be present in a full QR-bill
+        assert translations["payment_part"] in all_text
+        assert translations["receipt"] in all_text
+        assert translations["account_payable_to"] in all_text
+        assert translations["reference"] in all_text
+        assert translations["additional_information"] in all_text
+        assert translations["currency"] in all_text
+        assert translations["amount"] in all_text
+        assert translations["acceptance_point"] in all_text
+        assert translations["payable_by"] in all_text
+
+        # payable_by_name_address should NOT be present when debtor is provided
+        assert translations["payable_by_name_address"] not in all_text
+
+    @pytest.mark.parametrize("language", ["en", "de", "fr", "it"])
+    def test_translations_without_debtor(self, language):
+        """Test translations when debtor is None (uses payable_by_name_address)."""
         creditor = Creditor(
-            name="Test",
-            street="Street",
+            name="Test Company",
+            street="Main Street",
             building_number="1",
             postal_code="8000",
-            city="City",
+            city="Zurich",
             country="CH",
         )
 
         qr_bill = QRBill(
-            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
+            account="CH5800791123000889012",
             creditor=creditor,
             amount=Decimal("100.00"),
             currency="CHF",
+            reference_type="SCOR",
+            reference="RF18539007547034",
         )
 
-        svg_string = qr_bill.generate_svg(language="fr")
+        svg_string = qr_bill.generate_svg(language=language)
         root = ET.fromstring(svg_string)
-
         all_text = TestReceiptContent._get_all_text_content(root)
 
-        assert "Section paiement" in all_text
-        assert "Récépissé" in all_text
-        assert "Compte / Payable à" in all_text
+        # Get translations from constants
+        translations = TRANSLATIONS[language]
 
-    def test_italian_language(self):
-        """Test SVG generation with Italian language."""
+        # payable_by_name_address should be present (full text with parentheses)
+        assert translations["payable_by_name_address"] in all_text
+
+        # Verify that only the full "payable_by_name_address" appears, not the standalone "payable_by"
+        # Count occurrences: should only appear within "payable_by_name_address"
+        payable_by_name_address_count = all_text.count(
+            translations["payable_by_name_address"]
+        )
+        payable_by_count = all_text.count(translations["payable_by"])
+
+        # The payable_by text should appear exactly as many times as payable_by_name_address
+        # (i.e., it only appears as part of "payable_by_name_address", not standalone)
+        assert payable_by_name_address_count == payable_by_count, (
+            f"Expected '{translations['payable_by']}' to only appear within "
+            f"'{translations['payable_by_name_address']}', but found standalone occurrences"
+        )
+
+        # Other always-present translations
+        assert translations["payment_part"] in all_text
+        assert translations["receipt"] in all_text
+        assert translations["account_payable_to"] in all_text
+        assert translations["currency"] in all_text
+        assert translations["amount"] in all_text
+        assert translations["acceptance_point"] in all_text
+
+    @pytest.mark.parametrize("language", ["en", "de", "fr", "it"])
+    def test_translations_without_reference(self, language):
+        """Test translations when reference is not provided (NON type)."""
         creditor = Creditor(
-            name="Test",
-            street="Street",
+            name="Test Company",
+            street="Main Street",
             building_number="1",
             postal_code="8000",
-            city="City",
+            city="Zurich",
             country="CH",
         )
 
         qr_bill = QRBill(
-            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
+            account="CH5800791123000889012",
             creditor=creditor,
             amount=Decimal("100.00"),
             currency="CHF",
+            reference_type="NON",
         )
 
-        svg_string = qr_bill.generate_svg(language="it")
+        svg_string = qr_bill.generate_svg(language=language)
         root = ET.fromstring(svg_string)
-
         all_text = TestReceiptContent._get_all_text_content(root)
 
-        assert "Sezione pagamento" in all_text
-        assert "Ricevuta" in all_text
-        assert "Conto / Pagabile a" in all_text
+        # Get translations from constants
+        translations = TRANSLATIONS[language]
 
-    def test_english_language(self):
-        """Test SVG generation with English language (default)."""
+        # Reference label should NOT be present
+        assert translations["reference"] not in all_text
+
+        # Other translations should still be present
+        assert translations["payment_part"] in all_text
+        assert translations["receipt"] in all_text
+        assert translations["account_payable_to"] in all_text
+        assert translations["currency"] in all_text
+        assert translations["amount"] in all_text
+        assert translations["acceptance_point"] in all_text
+
+    @pytest.mark.parametrize("language", ["en", "de", "fr", "it"])
+    def test_translations_with_zero_amount_notification_mode(self, language):
+        """Test translations when amount is 0.00 (notification mode with language-specific text)."""
         creditor = Creditor(
-            name="Test",
-            street="Street",
+            name="Test Company",
+            street="Main Street",
             building_number="1",
             postal_code="8000",
-            city="City",
+            city="Zurich",
             country="CH",
         )
 
         qr_bill = QRBill(
-            account="CH5800791123000889012",  # Regular IBAN, not QR-IBAN
+            account="CH5800791123000889012",
             creditor=creditor,
-            amount=Decimal("100.00"),
+            amount=Decimal("0.00"),
             currency="CHF",
         )
 
-        svg_string = qr_bill.generate_svg(language="en")
+        svg_string = qr_bill.generate_svg(language=language)
         root = ET.fromstring(svg_string)
-
         all_text = TestReceiptContent._get_all_text_content(root)
 
-        assert "Payment part" in all_text
-        assert "Receipt" in all_text
-        assert "Account / Payable to" in all_text
+        # Get translations from constants
+        translations = TRANSLATIONS[language]
+        notification_text = ALLOWED_NOTIFICATION_TEXTS[language]
+
+        # additional_information label should be present
+        assert translations["additional_information"] in all_text
+
+        # Notification text should be present in the appropriate language
+        assert notification_text in all_text
+
+        # Amount should show 0.00
+        assert "0.00" in all_text
+
+        # Other translations
+        assert translations["payment_part"] in all_text
+        assert translations["receipt"] in all_text
+        assert translations["account_payable_to"] in all_text
+        assert translations["currency"] in all_text
+        assert translations["amount"] in all_text
+        assert translations["acceptance_point"] in all_text
+
+    @pytest.mark.parametrize("language", ["en", "de", "fr", "it"])
+    def test_translations_with_none_amount_donation_mode(self, language):
+        """Test translations when amount is None (donation mode)."""
+        creditor = Creditor(
+            name="Test Company",
+            street="Main Street",
+            building_number="1",
+            postal_code="8000",
+            city="Zurich",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+        )
+
+        svg_string = qr_bill.generate_svg(language=language)
+        root = ET.fromstring(svg_string)
+        all_text = TestReceiptContent._get_all_text_content(root)
+
+        # Get translations from constants
+        translations = TRANSLATIONS[language]
+
+        # Currency and Amount labels should still be present
+        assert translations["currency"] in all_text
+        assert translations["amount"] in all_text
+
+        # Other always-present translations
+        assert translations["payment_part"] in all_text
+        assert translations["receipt"] in all_text
+        assert translations["account_payable_to"] in all_text
+        assert translations["acceptance_point"] in all_text
+
+        # additional_information should NOT be present (no amount, so no auto-fill)
+        assert translations["additional_information"] not in all_text
+
+    @pytest.mark.parametrize("language", ["en", "de", "fr", "it"])
+    def test_translations_with_additional_information(self, language):
+        """Test additional_information label when explicitly provided."""
+        creditor = Creditor(
+            name="Test Company",
+            street="Main Street",
+            building_number="1",
+            postal_code="8000",
+            city="Zurich",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("500.00"),
+            currency="CHF",
+            additional_information="Custom payment info",
+        )
+
+        svg_string = qr_bill.generate_svg(language=language)
+        root = ET.fromstring(svg_string)
+        all_text = TestReceiptContent._get_all_text_content(root)
+
+        # Get translations from constants
+        translations = TRANSLATIONS[language]
+
+        # additional_information label should be present when explicitly provided
+        assert translations["additional_information"] in all_text
+        assert "Custom payment info" in all_text
+
+    @pytest.mark.parametrize("language", ["en", "de", "fr", "it"])
+    def test_translations_without_additional_information(self, language):
+        """Test that additional_information label is not shown when not provided."""
+        creditor = Creditor(
+            name="Test Company",
+            street="Main Street",
+            building_number="1",
+            postal_code="8000",
+            city="Zurich",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            amount=Decimal("500.00"),
+            currency="CHF",
+        )
+
+        svg_string = qr_bill.generate_svg(language=language)
+        root = ET.fromstring(svg_string)
+        all_text = TestReceiptContent._get_all_text_content(root)
+
+        # Get translations from constants
+        translations = TRANSLATIONS[language]
+
+        # additional_information label should NOT be present
+        assert translations["additional_information"] not in all_text
