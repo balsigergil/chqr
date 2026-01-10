@@ -85,6 +85,17 @@ class TestIBANValidation:
                 currency="CHF",
             )
 
+    def test_iban_with_letters(self):
+        """Test that IBAN with letters is accepted."""
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        # Valid IBAN with a letter 'A'
+        iban = "CH90007911230008890A1"
+        qr_bill = QRBill(account=iban, creditor=creditor, currency="CHF")
+        assert qr_bill.account == iban
+
 
 class TestReferenceValidation:
     """Test reference type and number validation."""

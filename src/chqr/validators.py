@@ -76,10 +76,10 @@ def validate_iban(iban: str) -> None:
     if len(iban) != 21:
         raise ValidationError(f"IBAN must be exactly 21 characters, got {len(iban)}")
 
-    # Check format (2 letters + 19 digits)
+    # Check format (2 letters + 19 alphanumeric characters)
     if not re.match(r"^[A-Z]{2}[\dA-Z]{19}$", iban):
         raise ValidationError(
-            "IBAN format invalid. Must be 2 letters followed by 19 digits"
+            "IBAN format invalid. Must be 2 letters followed by 19 alphanumeric characters"
         )
 
     # Validate checksum using MOD97
