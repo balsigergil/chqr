@@ -65,30 +65,25 @@ def validate_iban(iban: str) -> None:
     if not iban:
         raise ValidationError("IBAN is required")
 
-    # Remove spaces for validation
-    iban_clean = iban.replace(" ", "")
-
     # Check country code first (must be CH or LI)
     # This gives a clearer error for foreign IBANs
-    if len(iban_clean) >= 2:
-        country_code = iban_clean[:2]
+    if len(iban) >= 2:
+        country_code = iban[:2]
         if country_code not in ("CH", "LI"):
             raise ValidationError(f"IBAN must be from CH or LI, got {country_code}")
 
     # Check length (specific to Swiss/Liechtenstein IBANs)
-    if len(iban_clean) != 21:
-        raise ValidationError(
-            f"IBAN must be exactly 21 characters, got {len(iban_clean)}"
-        )
+    if len(iban) != 21:
+        raise ValidationError(f"IBAN must be exactly 21 characters, got {len(iban)}")
 
     # Check format (2 letters + 19 digits)
-    if not re.match(r"^[A-Z]{2}\d{19}$", iban_clean):
+    if not re.match(r"^[A-Z]{2}[\dA-Z]{19}$", iban):
         raise ValidationError(
             "IBAN format invalid. Must be 2 letters followed by 19 digits"
         )
 
     # Validate checksum using MOD97
-    if not _validate_iban_checksum(iban_clean):
+    if not _validate_iban_checksum(iban):
         raise ValidationError("IBAN checksum is invalid")
 
 

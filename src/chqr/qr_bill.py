@@ -3,7 +3,7 @@
 from decimal import Decimal
 import segno
 
-from chqr.constants import ALLOWED_NOTIFICATION_TEXTS
+from .constants import ALLOWED_NOTIFICATION_TEXTS
 from .creditor import Creditor
 from .debtor import UltimateDebtor
 from .svg_generator import generate_svg
@@ -55,6 +55,10 @@ class QRBill:
         Raises:
             ValidationError: If any input data is invalid
         """
+
+        # Clean IBAN
+        account = account.replace(" ", "").upper()
+
         # Validate IBAN
         validate_iban(account)
 
@@ -90,7 +94,7 @@ class QRBill:
                     f"For notification text '{additional_information}', amount must be 0.00"
                 )
 
-        self.account = account.replace(" ", "")
+        self.account = account
         self.creditor = creditor
         self.currency = currency
         self.amount = amount
