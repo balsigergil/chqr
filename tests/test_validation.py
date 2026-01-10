@@ -4,7 +4,16 @@ import pytest
 from decimal import Decimal
 
 from chqr import QRBill, Creditor, ValidationError
-from chqr.validators import is_qr_iban
+from chqr.validators import (
+    is_qr_iban,
+    validate_iban,
+    validate_creditor_reference,
+    validate_qr_reference,
+    validate_currency,
+    validate_country_code,
+    validate_character_set,
+    validate_reference_type,
+)
 
 
 class TestIBANValidation:
@@ -62,6 +71,24 @@ class TestIBANValidation:
         # QR-IID range: 30000-31999
         assert is_qr_iban("CH4431999123000889012") is True  # QR-IID: 31999
         assert is_qr_iban("CH5800791123000889012") is False  # Regular IID
+
+    def test_is_qr_iban_invalid_length(self):
+        """Test is_qr_iban with invalid length."""
+        assert is_qr_iban("CH123") is False
+
+    def test_is_qr_iban_index_error(self):
+        """Test is_qr_iban with non-integer IID."""
+        assert is_qr_iban("CH12ABC45678901234567") is False
+
+    def test_validate_iban_empty(self):
+        """Test validate_iban with empty value."""
+        with pytest.raises(ValidationError, match="IBAN is required"):
+            validate_iban("")
+
+    def test_validate_iban_invalid_format(self):
+        """Test validate_iban with invalid format."""
+        with pytest.raises(ValidationError, match="IBAN format invalid"):
+            validate_iban("CH12!@#$%^&*()_+12345")
 
     def test_iban_checksum_validation(self):
         """Test that IBAN checksum is validated using MOD97."""
@@ -130,6 +157,12 @@ class TestReferenceValidation:
                 reference_type="QRR",  # Wrong!
             )
 
+    def test_validate_reference_type_invalid_for_regular_iban(self):
+        """Test validate_reference_type with invalid type for regular IBAN."""
+        regular_iban = "CH1200000000000000001"
+        with pytest.raises(ValidationError, match="Reference type must be SCOR or NON"):
+            validate_reference_type(regular_iban, "INVALID")
+
     def test_qr_reference_format(self):
         """Test QR reference must be 27 digits."""
         creditor = Creditor(
@@ -191,6 +224,11 @@ class TestReferenceValidation:
                 reference_type="QRR",
                 reference="210000000003139471430009018",  # Wrong check digit
             )
+
+    def test_validate_qr_reference_empty(self):
+        """Test validate_qr_reference with empty value."""
+        with pytest.raises(ValidationError, match="QR reference is required"):
+            validate_qr_reference("")
 
     def test_creditor_reference_format(self):
         """Test Creditor Reference (ISO 11649) format validation."""
@@ -293,6 +331,18 @@ class TestReferenceValidation:
             reference="RF25A",  # Valid minimal reference
         )
         assert qr_bill.reference == "RF25A"
+
+    def test_validate_creditor_reference_empty(self):
+        """Test validate_creditor_reference with empty value."""
+        with pytest.raises(ValidationError, match="Creditor Reference is required"):
+            validate_creditor_reference("")
+
+    def test_validate_creditor_reference_non_alnum(self):
+        """Test validate_creditor_reference with non-alphanumeric value."""
+        with pytest.raises(
+            ValidationError, match="Creditor Reference must be alphanumeric"
+        ):
+            validate_creditor_reference("RF18 5390")  # space makes it non-alnum
 
 
 class TestAmountValidation:
@@ -424,6 +474,11 @@ class TestAmountValidation:
                 currency="USD",
             )
 
+    def test_validate_currency_empty(self):
+        """Test validate_currency with empty value."""
+        with pytest.raises(ValidationError, match="Currency is required"):
+            validate_currency("")
+
 
 class TestAddressValidation:
     """Test address field validation."""
@@ -464,6 +519,18 @@ class TestAddressValidation:
         with pytest.raises(ValidationError, match="2.*character"):
             Creditor(name="Test", postal_code="8000", city="Zurich", country="CHE")
 
+    def test_validate_country_code_non_alpha(self):
+        """Test validate_country_code with non-alphabetic value."""
+        with pytest.raises(
+            ValidationError, match="Country code must contain only letters"
+        ):
+            validate_country_code("12")
+
+    def test_validate_country_code_lowercase(self):
+        """Test validate_country_code with lowercase value."""
+        with pytest.raises(ValidationError, match="Country code must be uppercase"):
+            validate_country_code("ch")
+
 
 class TestCharacterSetValidation:
     """Test UTF-8 Latin character set restrictions."""
@@ -492,3 +559,9 @@ class TestCharacterSetValidation:
         # Arabic
         with pytest.raises(ValidationError, match="character"):
             Creditor(name="اختبار", postal_code="8000", city="Zurich", country="CH")
+
+    def test_validate_character_set_empty(self):
+        """Test validate_character_set with empty/None value."""
+        # Should not raise anything
+        validate_character_set("", "test_field")
+        validate_character_set(None, "test_field")

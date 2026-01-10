@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import pytest
 from chqr import QRBill, Creditor, UltimateDebtor
 from chqr.constants import TRANSLATIONS, ALLOWED_NOTIFICATION_TEXTS
+from chqr.svg_generator import format_qr_reference
 
 
 # SVG namespace
@@ -487,6 +488,11 @@ class TestReferenceFormatting:
 
         # SCOR reference: RF18 5390 0754 7034
         assert "RF18 5390 0754 7034" in all_text
+
+    def test_format_qr_reference_short(self):
+        """Test format_qr_reference with short values."""
+        assert format_qr_reference("1") == "1"
+        assert format_qr_reference("") == ""
 
 
 class TestAmountFormatting:
