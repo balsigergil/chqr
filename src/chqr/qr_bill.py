@@ -187,6 +187,7 @@ class QRBill:
             content=data,
             version=None,  # Auto-select version
             error="M",  # Error correction level M
+            encoding="utf-8",  # Swiss QR-bill spec requires UTF-8 (coding type 1)
         )
 
         return qr

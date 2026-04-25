@@ -203,6 +203,49 @@ class TestQRCodeParameters:
         assert qr_code.version is not None
         assert qr_code.version <= 25
 
+    def test_qr_code_uses_utf8_encoding(self):
+        """Test that the generated QR code uses UTF-8 encoding, not ISO-8859-1.
+
+        The Swiss QR-bill spec mandates UTF-8 (coding type 1). segno defaults
+        to ISO-8859-1 unless explicitly told otherwise. This test verifies the
+        fix by checking that the QR version produced with explicit UTF-8 bytes
+        matches the version produced by generate_qr_code().
+        """
+        creditor = Creditor(
+            name="Test Müller & Söhne",  # umlauts: 2 bytes in UTF-8, 1 in ISO-8859-1
+            postal_code="8000",
+            city="Zürich",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH5800791123000889012",
+            creditor=creditor,
+            currency="CHF",
+            reference_type="NON",
+        )
+
+        data_string = qr_bill.build_data_string()
+        qr_code = qr_bill.generate_qr_code()
+
+        # Build reference QR codes using explicit byte encodings
+        import segno as _segno
+
+        qr_utf8 = _segno.make(data_string.encode("utf-8"), error="M")
+        qr_iso = _segno.make(data_string.encode("iso-8859-1"), error="M")
+
+        # UTF-8 encodes umlauts as 2 bytes; ISO-8859-1 uses 1 byte.
+        # So the UTF-8 QR code must be at least as large as the ISO one.
+        assert qr_utf8.version >= qr_iso.version, (
+            "UTF-8 QR should need >= version than ISO-8859-1 for strings with umlauts"
+        )
+
+        # The generated QR code must match the UTF-8 version, not the ISO one.
+        assert qr_code.version == qr_utf8.version, (
+            f"QR code version {qr_code.version} does not match UTF-8 version "
+            f"{qr_utf8.version} (ISO-8859-1 version is {qr_iso.version})"
+        )
+
     def test_qr_data_string_is_utf8_compatible(self):
         """Test that data string can be encoded as UTF-8."""
         creditor = Creditor(
