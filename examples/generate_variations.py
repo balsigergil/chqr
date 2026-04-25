@@ -337,7 +337,7 @@ def example_10_with_billing_info():
         amount=Decimal("5432.10"),
         currency="CHF",
         reference_type="SCOR",
-        reference="RF48500040025684371",
+        reference="RF18539007547034",
         additional_information=additional_message,
         billing_information=billing_info,  # Using the billing_information field
         debtor=debtor,
