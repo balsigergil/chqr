@@ -198,7 +198,7 @@ def test_recreate_official_data_schema(fixture_file):
         fixture_file: Name of the fixture file to test
     """
     # Load the official test data
-    expected_output = fixture_file.read_text().rstrip("\n")
+    expected_output = fixture_file.read_text()
 
     # Parse the QR data
     parsed_data = _parse_qr_data_file(fixture_file)

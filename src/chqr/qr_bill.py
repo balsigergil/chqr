@@ -96,7 +96,7 @@ class QRBill:
                 )
 
         # Rule: The additional information field (unstructured message + billing information) must not exceed 140 characters.
-        # See spec version 2.3 page 37
+        # See spec version 2.3 section 4.2.2.
         if additional_information and billing_information:
             validate_additional_information(additional_information, billing_information)
 
@@ -168,14 +168,15 @@ class QRBill:
         elements.append(self.additional_information)  # Unstructured message
         elements.append("EPD")  # Trailer (End Payment Data)
 
-        # Billing information (optional)
-        if self.billing_information:
-            elements.append(self.billing_information)
+        # Billing information, can be empty
+        elements.append(self.billing_information)
 
-        # Alternative procedures (optional, max 2)
-        if self.alternative_procedures:
-            for procedure in self.alternative_procedures[:2]:  # Max 2 procedures
-                elements.append(procedure)
+        # Alternative procedures, always 2 lines, max 100 chars each, can be empty
+        for i in range(2):
+            if len(self.alternative_procedures) > i:
+                elements.append(self.alternative_procedures[i])
+            else:
+                elements.append("")
 
         return "\n".join(elements)
 

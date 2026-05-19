@@ -576,7 +576,10 @@ class TestAdditionalInformationValidation:
         self,
     ):
         """Test that unstructured message and billing information do not exceed 140 characters with the raw validation function."""
-        with pytest.raises(ValidationError):
+        with pytest.raises(
+            ValidationError,
+            match="Combined length of unstructured message and billing information exceeds 140 characters",
+        ):
             validate_additional_information(
                 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
                 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxy",
@@ -595,7 +598,10 @@ class TestAdditionalInformationValidation:
             name="Test", postal_code="8000", city="Zurich", country="CH"
         )
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(
+            ValidationError,
+            match="Combined length of unstructured message and billing information exceeds 140 characters",
+        ):
             QRBill(
                 account="CH5800791123000889012",
                 creditor=creditor,

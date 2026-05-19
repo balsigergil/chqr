@@ -3,11 +3,9 @@
 from decimal import Decimal
 from pathlib import Path
 
-
 from chqr import QRBill
 from chqr.creditor import Creditor
 from chqr.debtor import UltimateDebtor
-
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures" / "qr_data"
 
@@ -50,7 +48,7 @@ class TestQRDataString:
 
         # Load expected fixture
         fixture_path = FIXTURES_DIR / "example_1_qrr_with_amount.txt"
-        expected = fixture_path.read_text().rstrip("\n")
+        expected = fixture_path.read_text()
 
         assert result == expected
 
@@ -90,7 +88,7 @@ class TestQRDataString:
         result = qr_bill.build_data_string()
 
         fixture_path = FIXTURES_DIR / "example_2_with_billing_info.txt"
-        expected = fixture_path.read_text().rstrip("\n")
+        expected = fixture_path.read_text()
 
         assert result == expected
 
@@ -127,7 +125,7 @@ class TestQRDataString:
         result = qr_bill.build_data_string()
 
         fixture_path = FIXTURES_DIR / "example_3_scor_reference.txt"
-        expected = fixture_path.read_text().rstrip("\n")
+        expected = fixture_path.read_text()
 
         assert result == expected
 
@@ -152,7 +150,46 @@ class TestQRDataString:
         result = qr_bill.build_data_string()
 
         fixture_path = FIXTURES_DIR / "example_4_donation.txt"
-        expected = fixture_path.read_text().rstrip("\n")
+        expected = fixture_path.read_text()
+
+        assert result == expected
+
+    def test_example_5_with_alternative_no_billing_info(self):
+        """Test example 5: With alternative procedure."""
+        creditor = Creditor(
+            name="Max Muster & Söhne",
+            street="Musterstrasse",
+            building_number="123",
+            postal_code="8000",
+            city="Seldwyla",
+            country="CH",
+        )
+
+        debtor = UltimateDebtor(
+            name="Simon Muster",
+            street="Musterstrasse",
+            building_number="1",
+            postal_code="8000",
+            city="Seldwyla",
+            country="CH",
+        )
+
+        qr_bill = QRBill(
+            account="CH4431999123000889012",
+            creditor=creditor,
+            amount=Decimal("1949.75"),
+            currency="CHF",
+            debtor=debtor,
+            reference_type="QRR",
+            reference="210000000003139471430009017",
+            additional_information="Order from 15.10.2020",
+            alternative_procedures=["eBill/B/simon.muster@example.com"],
+        )
+
+        result = qr_bill.build_data_string()
+
+        fixture_path = FIXTURES_DIR / "example_5_with_alternative_no_billing_info.txt"
+        expected = fixture_path.read_text()
 
         assert result == expected
 
