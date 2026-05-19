@@ -406,3 +406,19 @@ def validate_additional_information(
         raise ValidationError(
             "Combined length of unstructured message and billing information exceeds 140 characters."
         )
+
+
+def validate_alternative_procedures(alternative_procedures: list[str]) -> None:
+    """Validate alternative procedures.
+
+    The maximum number of procedures is 2.
+    The maximum length per procedure is 100 characters.
+
+    See specs version 2.3 section 4.2.2.
+    """
+    if len(alternative_procedures) > 2:
+        raise ValidationError("Maximum of two alternative procedures are allowed.")
+
+    for procedure in alternative_procedures:
+        if len(procedure) > 100:
+            raise ValidationError("Alternative procedure exceeds 100 characters.")

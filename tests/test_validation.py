@@ -14,6 +14,7 @@ from chqr.validators import (
     validate_character_set,
     validate_reference_type,
     validate_additional_information,
+    validate_alternative_procedures,
 )
 
 
@@ -602,3 +603,24 @@ class TestAdditionalInformationValidation:
                 additional_information="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
                 billing_information="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxy",
             )
+
+
+class TestAlternativeProceduresValidation:
+    def test_max_number_of_procedures(self):
+        """Test that the maximum number of alternative procedures is 2."""
+        with pytest.raises(
+            ValidationError, match="Maximum of two alternative procedures are allowed"
+        ):
+            validate_alternative_procedures(
+                ["Procedure 1", "Procedure 2", "Procedure 3"]
+            )
+
+    def test_procedures_too_long(self):
+        """Test that the length of each alternative procedure is limited to 100 characters."""
+        with pytest.raises(
+            ValidationError, match="Alternative procedure exceeds 100 characters"
+        ):
+            validate_alternative_procedures(["Procedure 1" * 100])
+
+    def test_valid_procedures(self):
+        validate_alternative_procedures(["Procedure 1", "Procedure 2"])
