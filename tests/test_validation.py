@@ -13,6 +13,7 @@ from chqr.validators import (
     validate_country_code,
     validate_character_set,
     validate_reference_type,
+    validate_additional_information,
 )
 
 
@@ -565,3 +566,39 @@ class TestCharacterSetValidation:
         # Should not raise anything
         validate_character_set("", "test_field")
         validate_character_set(None, "test_field")
+
+
+class TestAdditionalInformationValidation:
+    """Test additional information field validation."""
+
+    def test_unstructured_msg_and_billing_info_not_exceed_140_characters_validation(
+        self,
+    ):
+        """Test that unstructured message and billing information do not exceed 140 characters with the raw validation function."""
+        with pytest.raises(ValidationError):
+            validate_additional_information(
+                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxy",
+            )
+
+        validate_additional_information(
+            "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        )
+
+    def test_unstructured_msg_and_billing_info_not_exceed_140_characters_constructor(
+        self,
+    ):
+        """Test that unstructured message and billing information do not exceed 140 characters with the QRBill constructor."""
+        creditor = Creditor(
+            name="Test", postal_code="8000", city="Zurich", country="CH"
+        )
+
+        with pytest.raises(ValidationError):
+            QRBill(
+                account="CH5800791123000889012",
+                creditor=creditor,
+                currency="CHF",
+                additional_information="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                billing_information="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxy",
+            )

@@ -16,6 +16,7 @@ from .validators import (
     validate_creditor_reference,
     validate_currency,
     validate_amount,
+    validate_additional_information,
 )
 
 
@@ -93,6 +94,11 @@ class QRBill:
                 raise ValidationError(
                     f"For notification text '{additional_information}', amount must be 0.00"
                 )
+
+        # Rule: The additional information field (unstructured message + billing information) must not exceed 140 characters.
+        # See spec version 2.3 page 37
+        if additional_information and billing_information:
+            validate_additional_information(additional_information, billing_information)
 
         self.account = account
         self.creditor = creditor

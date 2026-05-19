@@ -396,3 +396,13 @@ def validate_character_set(value: str, field_name: str) -> None:
                 f"{field_name} contains invalid character '{char}' (U+{code_point:04X}). "
                 f"Only Latin characters are allowed."
             )
+
+
+def validate_additional_information(
+    unstructured_message: str, billing_information: str
+) -> None:
+    """Validate additional information."""
+    if len(unstructured_message) + len(billing_information) > 140:
+        raise ValidationError(
+            "Combined length of unstructured message and billing information exceeds 140 characters."
+        )
